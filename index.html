@@ -982,18 +982,30 @@
 
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
         import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-            authDomain: "el-jasus.firebaseapp.com",
-            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "el-jasus",
-            appId: "1:415659587906:web:782f7940176ea4097eb0db"
-        };
+       
+const firebaseConfig = {
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
+};
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getDatabase(app);
+
+        // Track auth state so Firebase SDK knows the user is logged in
+        let currentUser = null;
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+        });
 
         const gameData = {
             places: [
@@ -1155,6 +1167,12 @@
         document.getElementById('createBtn').onclick = async () => {
             myName = document.getElementById('pName').value.trim();
             if(!myName) return alert("الاسم مطلوب");
+
+            if (!currentUser) {
+                alert('يجب تسجيل الدخول أولاً لإنشاء غرفة');
+                window.location.href = 'login.html';
+                return;
+            }
             
             // Save name to localStorage
             localStorage.setItem('eljasus_user_name', myName);
@@ -1162,46 +1180,66 @@
             myRoom = Math.random().toString(36).substring(2, 6).toUpperCase();
             isHost = true;
             
-            await set(ref(db, 'rooms/' + myRoom), { 
-                host: myName, 
-                status: 'waiting', 
-                players: [myName], 
-                turn: 0, 
-                category: document.getElementById('gameCat').value, 
-                visibility: 'private',
-                secret: null,
-                spyIdx: null
-            });
-            
-            // Save room code and redirect to room page
-            localStorage.setItem('currentRoom', myRoom);
-            localStorage.setItem('isHost', 'true');
-            window.location.href = 'room.html';
+            try {
+                await set(ref(db, 'rooms/' + myRoom), { 
+                    host: myName, 
+                    status: 'waiting', 
+                    players: [myName], 
+                    turn: 0, 
+                    category: document.getElementById('gameCat').value, 
+                    visibility: 'private',
+                    secret: null,
+                    spyIdx: null
+                });
+                
+                // Save room code and redirect to room page
+                localStorage.setItem('currentRoom', myRoom);
+                localStorage.setItem('isHost', 'true');
+                window.location.href = 'room.html';
+            } catch(e) {
+                console.error('Create room error:', e);
+                alert('فشل إنشاء الغرفة: ' + e.message);
+            }
         };
 
         document.getElementById('joinBtn').onclick = async () => {
             myName = document.getElementById('pName').value.trim();
             if(!myName) return alert("الاسم مطلوب");
+
+            if (!currentUser) {
+                alert('يجب تسجيل الدخول أولاً للانضمام لغرفة');
+                window.location.href = 'login.html';
+                return;
+            }
             
             // Save name to localStorage
             localStorage.setItem('eljasus_user_name', myName);
             
-            myRoom = prompt("أدخل كود الغرفة:").toUpperCase();
-            const snap = await get(ref(db, 'rooms/' + myRoom));
-            if(!snap.exists()) return alert("الغرفة غير موجودة");
+            const codeInput = prompt("أدخل كود الغرفة:");
+            if (!codeInput) return;
+            myRoom = codeInput.toUpperCase();
             
-            const d = snap.val();
-            if(!d.players.includes(myName)) {
-                if(d.players.length >= 10) return alert("الغرفة ممتلئة");
-                await update(ref(db, 'rooms/' + myRoom), { players: [...d.players, myName] });
+            try {
+                const snap = await get(ref(db, 'rooms/' + myRoom));
+                if(!snap.exists()) return alert("الغرفة غير موجودة");
+                
+                const d = snap.val();
+                const players = Array.isArray(d.players) ? d.players : Object.values(d.players || {});
+                if(!players.includes(myName)) {
+                    if(players.length >= 10) return alert("الغرفة ممتلئة");
+                    await update(ref(db, 'rooms/' + myRoom), { players: [...players, myName] });
+                }
+                
+                isHost = false;
+                
+                // Save room code and redirect to room page
+                localStorage.setItem('currentRoom', myRoom);
+                localStorage.setItem('isHost', 'false');
+                window.location.href = 'room.html';
+            } catch(e) {
+                console.error('Join room error:', e);
+                alert('فشل الانضمام للغرفة: ' + e.message);
             }
-            
-            isHost = false;
-            
-            // Save room code and redirect to room page
-            localStorage.setItem('currentRoom', myRoom);
-            localStorage.setItem('isHost', 'false');
-            window.location.href = 'room.html';
         };
     </script>
 
