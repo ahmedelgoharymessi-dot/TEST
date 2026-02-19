@@ -508,16 +508,17 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-            authDomain: "el-jasus.firebaseapp.com",
-            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "el-jasus",
-            storageBucket: "el-jasus.firebasestorage.app",
-            messagingSenderId: "415659587906",
-            appId: "1:415659587906:web:782f7940176ea4097eb0db",
-            measurementId: "G-N4K79FP56N"
-        };
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
+};
         
         firebase.initializeApp(firebaseConfig);
 
@@ -573,7 +574,7 @@
                         displayName: usernameValue
                     });
                 })
-                .then(() => {
+                .then(async () => {
                     localStorage.setItem('eljasus_user_name', usernameValue);
                     
                     alert('تم إنشاء الحساب! مرحباً، ' + usernameValue);
