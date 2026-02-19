@@ -214,13 +214,18 @@
         import { getAuth, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
         import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-            authDomain: "el-jasus.firebaseapp.com",
-            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "el-jasus",
-            appId: "1:415659587906:web:782f7940176ea4097eb0db"
-        };
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
+};
+
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
