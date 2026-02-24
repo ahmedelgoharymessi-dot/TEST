@@ -13,6 +13,7 @@
     <script src="emoji-reactions.js" defer></script>
     <script src="voice-chat.js" defer></script>
     <script src="screenshot.js" defer></script>
+    <script src="moderation.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="ElJasus2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -142,7 +143,11 @@
             animation: shakeX 0.5s;
         }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        /* ── Scrollbar styles ─────────────────────────────────────────────── */
+        /* Page-level scrollbar (browser default, left side in RTL) — untouched */
+
+        /* Players list internal scrollbar — styled, slightly wider */
+        .custom-scrollbar::-webkit-scrollbar { width: 10px; }
         .custom-scrollbar::-webkit-scrollbar-track { 
             background: rgba(0, 242, 255, 0.05);
             border-radius: 10px;
@@ -152,6 +157,11 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #33f5ff, #9b59ff);
+        }
+        /* Firefox */
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--accent-color) rgba(0,242,255,0.05); }
 
         .fa-crown {
             color: #ffd700;
@@ -184,8 +194,8 @@
     </div>
 
     <!-- Discussion Screen -->
-    <div id="discussion-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-4xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <div id="discussion-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-4xl rounded-[2rem] p-4 border border-white/10 shadow-2xl relative" style="max-height:94dvh;overflow-y:auto;">
             
             <!-- Chat Button -->
             <button id="toggleChatBtn" class="fixed top-6 left-6 z-[60] bg-gradient-to-r from-cyan-500 to-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all border-2 border-cyan-400/50">
@@ -304,7 +314,7 @@
 
     <!-- Room Overlay -->
     <div id="room-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative">
+        <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative overflow-y-auto" style="max-height:92dvh;">
             
             <!-- Back to Home -->
             <a href="index.html" class="absolute top-4 left-4 text-gray-400 hover:text-cyan-400 transition-colors">
@@ -344,7 +354,14 @@
                     <label class="text-[11px] font-bold opacity-50 uppercase tracking-widest" style="font-family: 'Orbitron', sans-serif;">اللاعبون المتصلون</label>
                     <span id="pCount" class="text-[11px] font-black dynamic-text-primary" style="font-family: 'Orbitron', sans-serif;">0/10</span>
                 </div>
-                <div id="roomPlayersList" class="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar"></div>
+
+                <!-- ✅ FIX: Players list now has its own fixed-height scroll box.
+                     The card/page scrollbar is untouched and still works for scrolling
+                     the rest of the room overlay (settings, buttons, etc.). -->
+                <div id="roomPlayersList"
+                     class="space-y-2 custom-scrollbar"
+                     style="max-height: 260px; overflow-y: auto; padding-right: 8px;">
+                </div>
             </div>
 
             <button id="hostStartBtn" class="hidden w-full btn-main py-4 rounded-2xl font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider">
@@ -379,14 +396,17 @@ const firebaseConfig = {
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // Auth state - used for stat tracking and hints
-        // Also gates initRoom() so RTDB reads are authenticated
         let firebase_auth_user = null;
         let _roomInitialized = false;
 
         onAuthStateChanged(auth, (user) => {
             firebase_auth_user = user;
-            // Only init once, after auth is confirmed (even if null = guest)
+
+            if (window.MOD) {
+                MOD.init(db, user ? user.uid : null, ref, update, get);
+                MOD.checkOnLoad();
+            }
+
             if (!_roomInitialized) {
                 _roomInitialized = true;
                 joinPendingAndInit();
@@ -406,7 +426,6 @@ const firebaseConfig = {
                 "معرض سيارات", "محل ورد", "محل هدايا", "كشك", "بنزينة", "موقف ميكروباصات", "مغسلة سيارات", "محل حلويات", "فرن عيش", "محل سمك",
                 "محل جزارة", "محل بقالة", "صالة بولينج", "تنس طاولة", "ملعب كورة", "البورصة", "المدبح", "الجزيرة", "المنارة", "المقابر"
             ],
-
             football_teams: [
                 "الأهلي المصري", "الزمالك", "الإسماعيلي", "المصري البورسعيدي", "الاتحاد السكندري", "بيراميدز", "سموحة", "مودرن فيوتشر", "المقاولون العرب", "غزل المحلة", "الجونة", "البنك الأهلي", "سيراميكا كليوباترا", "إنبي", "طلائع الجيش", "حرس الحدود", "أسوان",
                 "الهلال السعودي", "النصر السعودي", "الاتحاد السعودي", "الأهلي السعودي", "الشباب السعودي", "العين الإماراتي", "شباب الأهلي", "الوداد المغربي", "الرجاء المغربي", "الجيش الملكي", "الترجي التونسي", "النجم الساحلي", "الإفريقي التونسي", "السد القطري", "الدحيل", "الكويت الكويتي", "القادسية الكويتي", "الوحدات الأردني", "الزوراء العراقي",
@@ -415,7 +434,6 @@ const firebaseConfig = {
                 "يوفنتوس", "إيه سي ميلان", "إنتر ميلان", "نابولي", "روما", "لاتسيو", "فيورنتينا", "بايرن ميونخ", "بوروسيا دورتموند", "باير ليفركوزن", "لايبزيج", "باريس سان جيرمان", "مارسيليا", "ليون", "موناكو", "أياكس أمستردام", "بنفيكا", "بورتو",
                 "منتخب مصر", "منتخب السعودية", "منتخب المغرب", "منتخب الجزائر", "منتخب تونس", "منتخب قطر", "منتخب البرازيل", "منتخب الأرجنتين", "منتخب فرنسا", "منتخب ألمانيا", "منتخب إسبانيا", "منتخب إيطاليا", "منتخب إنجلترا", "منتخب البرتغال", "منتخب بلجيكا", "منتخب كرواتيا", "منتخب هولندا", "منتخب الأوروغواي", "منتخب اليابان", "منتخب كوريا الجنوبية", "منتخب السنغال", "منتخب نيجيريا", "منتخب الكاميرون"
             ],
-
             food: [
                 "كشري", "ملوخية", "فول", "طعمية (فلافل)", "فتة باللحمة", "حواوشي", "محشي كرنب", "محشي ورق عنب", "ممبار", "كوارع",
                 "فتة كوارع", "كفتة مشوية", "طرب", "كباب", "كبدة إسكندراني", "سجق شرقي", "مكرونة بشاميل", "رقاق باللحمة", "جلاش", "أرز بلبن",
@@ -428,7 +446,6 @@ const firebaseConfig = {
                 "صينية بطاطس", "مكرونة بالصلصة", "ساندوتش جبنة", "شاي بلبن", "سحلب", "عصير قصب", "عرقسوس", "تمرهندي", "خروب", "سوبيا",
                 "مدمس", "بيض مسلوق", "جبنة بيضا", "لانشون", "بسطرمة", "مخروطة", "كوسة بالبشاميل", "أرز بالخلطة", "كبدة جملي", "فريك"
             ],
-
             jobs: [
                 "دكتور", "مهندس", "مدرس", "ضابط", "محامي", "محاسب", "ممرض", "صيدلي", "طيار", "سواق",
                 "نجار", "سباك", "كهربائي", "نقاش", "بنا", "ميكانيكي", "حلاق", "خياط", "طباخ", "جزار",
@@ -441,7 +458,6 @@ const firebaseConfig = {
                 "عامل بناء", "فني تكييف", "فني راديو", "ساحر", "مهرج", "راقص", "مدرب جيم", "سباح محترف", "عامل منجم", "عامل شحن",
                 "ساعي بريد", "موظف استقبال", "طبيب بيطري", "طبيب أسنان", "طبيب عيون", "محلل كورة", "سمسار", "تاجر", "مقاول", "طيار درون"
             ],
-
             companies: [
                 "Apple", "Google", "Microsoft", "Amazon", "Facebook", "Instagram", "WhatsApp", "YouTube", "TikTok", "Netflix",
                 "Samsung", "Huawei", "Xiaomi", "Oppo", "Sony", "LG", "Dell", "HP", "Intel", "Canon",
@@ -460,7 +476,6 @@ const firebaseConfig = {
         let myRoom = localStorage.getItem('currentRoom') || "";
         let isHost = localStorage.getItem('isHost') === 'true';
 
-        // Check if coming from onlinerooms.html with pending join
         const pendingRoom = localStorage.getItem('pendingRoomJoin');
         if (pendingRoom) {
             myRoom = pendingRoom;
@@ -468,19 +483,16 @@ const firebaseConfig = {
             localStorage.setItem('currentRoom', myRoom);
         }
 
-        // Redirect if no room found
         if (!myRoom || !myName) {
             window.location.href = 'index.html';
         }
 
-        // Helper: safely convert Firebase players (may be object or array) to array
         function toArray(val) {
             if (!val) return [];
             if (Array.isArray(val)) return val;
             return Object.values(val);
         }
 
-        // Join pending room if needed, then init
         async function joinPendingAndInit() {
             if (pendingRoom) {
                 try {
@@ -527,11 +539,9 @@ const firebaseConfig = {
             onValue(connectedRef, (snap) => {
                 if (snap.val() === true) {
                     const roomRef = ref(db, `rooms/${roomCode}`);
-
                     onDisconnect(roomRef).get().then((snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
-                            
                             if (data.host === playerName) {
                                 onDisconnect(roomRef).remove();
                             } else {
@@ -699,7 +709,6 @@ const firebaseConfig = {
             }
             
             const secret = gameData[d.category][Math.floor(Math.random() * gameData[d.category].length)];
-            // MULTIPLE SPIES: 1 for <8 players, 2 for 8+, 3 for 12+
             const spyCount = toArray(d.players).length >= 12 ? 3 : toArray(d.players).length >= 8 ? 2 : 1;
             const spyIndices = [];
             while (spyIndices.length < spyCount) {
@@ -724,8 +733,6 @@ const firebaseConfig = {
                 hints: {}
             });
         };
-
-        // GAME PHASES
 
         function showOnlineGame(d) {
             hideAllGameScreens();
@@ -775,24 +782,13 @@ const firebaseConfig = {
             hideAllGameScreens();
             document.getElementById('discussion-screen').classList.remove('hidden');
 
-            // Init emoji picker on chat input
             const chatInput = document.getElementById('discussionInput');
             if (chatInput && window.EmojiPicker && !chatInput._emojiInit) {
                 chatInput._emojiInit = true;
                 new EmojiPicker(chatInput, null);
             }
 
-            // Init reaction bar
-            const suspectsList = document.getElementById('suspectsList');
-            if (suspectsList && window.ReactionSystem && !suspectsList._reactInit) {
-                suspectsList._reactInit = true;
-                window._reactions = new ReactionSystem(document.getElementById('discussion-screen'));
-            }
-
-            // Load hint balance
             if (typeof loadHintBalance === 'function') loadHintBalance();
-
-            // Show any existing room hints
             showRoomHints(d);
             
             suspectsList.innerHTML = toArray(d.players).map(p => {
@@ -832,15 +828,12 @@ const firebaseConfig = {
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
             let suspects = d.suspects || {};
-            
             if(!suspects[targetPlayer]) suspects[targetPlayer] = [];
-            
             if(suspects[targetPlayer].includes(myName)) {
                 suspects[targetPlayer] = suspects[targetPlayer].filter(p => p !== myName);
             } else {
                 suspects[targetPlayer].push(myName);
             }
-            
             update(ref(db, 'rooms/' + myRoom), { suspects });
         };
 
@@ -848,17 +841,12 @@ const firebaseConfig = {
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
             let ready = d.readyForVote || [];
-            
             if(!ready.includes(myName)) {
                 ready.push(myName);
                 await update(ref(db, 'rooms/' + myRoom), { readyForVote: ready });
             }
-            
             if(ready.length >= toArray(d.players).length) {
-                await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'voting',
-                    votes: {}
-                });
+                await update(ref(db, 'rooms/' + myRoom), { status: 'voting', votes: {} });
             }
         }
 
@@ -874,20 +862,22 @@ const firebaseConfig = {
             const input = document.getElementById('discussionInput');
             const msg = input.value.trim();
             if(!msg) return;
+
+            if (window.MOD && await MOD.checkAndHandleMessage(msg, myName)) {
+                input.value = '';
+                return;
+            }
             
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
             let messages = d.discussionMessages || [];
             messages.push({ player: myName, msg: msg });
-            
             await update(ref(db, 'rooms/' + myRoom), { discussionMessages: messages });
             input.value = '';
         };
 
         document.getElementById('discussionInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('sendDiscussionBtn').click();
-            }
+            if (e.key === 'Enter') document.getElementById('sendDiscussionBtn').click();
         });
 
         function showVotingScreen(d) {
@@ -920,14 +910,10 @@ const firebaseConfig = {
         window.castVote = async (targetPlayer) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
-            
             if(d.votes && d.votes[myName]) return;
-            
             let votes = d.votes || {};
             votes[myName] = targetPlayer;
-            
             await update(ref(db, 'rooms/' + myRoom), { votes });
-            
             if(Object.keys(votes).length >= toArray(d.players).length) {
                 processVotes(d, votes);
             }
@@ -937,15 +923,10 @@ const firebaseConfig = {
             const voteCounts = {};
             toArray(d.players).forEach(p => voteCounts[p] = 0);
             Object.values(votes).forEach(v => voteCounts[v]++);
-            
             const maxVotes = Math.max(...Object.values(voteCounts));
             const topVoted = Object.keys(voteCounts).filter(p => voteCounts[p] === maxVotes);
-            
             if(topVoted.length > 1) {
-                await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'tie',
-                    tiedPlayers: topVoted
-                });
+                await update(ref(db, 'rooms/' + myRoom), { status: 'tie', tiedPlayers: topVoted });
                 setTimeout(async () => {
                     await update(ref(db, 'rooms/' + myRoom), { status: 'spinner' });
                 }, 2000);
@@ -957,19 +938,14 @@ const firebaseConfig = {
         function showTieScreen(d) {
             hideAllGameScreens();
             document.getElementById('tie-screen').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('tie-screen').classList.add('hidden');
-            }, 2000);
+            setTimeout(() => { document.getElementById('tie-screen').classList.add('hidden'); }, 2000);
         }
 
         function showSpinnerScreen(d) {
             hideAllGameScreens();
             document.getElementById('spinner-screen').classList.remove('hidden');
-            
             const spinnerContent = document.getElementById('spinnerContent');
             const startBtn = document.getElementById('startSpinnerBtn');
-            
             startBtn.onclick = async () => {
                 startBtn.disabled = true;
                 let index = 0;
@@ -977,58 +953,43 @@ const firebaseConfig = {
                     spinnerContent.innerText = d.tiedPlayers[index % d.tiedPlayers.length];
                     index++;
                 }, 100);
-                
                 setTimeout(async () => {
                     clearInterval(interval);
                     const selected = d.tiedPlayers[Math.floor(Math.random() * d.tiedPlayers.length)];
                     spinnerContent.innerText = selected;
-                    
-                    setTimeout(async () => {
-                        await checkGameResult(d, selected);
-                    }, 1500);
+                    setTimeout(async () => { await checkGameResult(d, selected); }, 1500);
                 }, 3000);
             };
         }
 
         async function checkGameResult(d, votedPlayer) {
             const spyName = d.players[d.spyIdx];
-            
             if(votedPlayer === spyName) {
-                await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'spy_guess',
-                    votedPlayer: spyName
-                });
+                await update(ref(db, 'rooms/' + myRoom), { status: 'spy_guess', votedPlayer: spyName });
             } else {
-                await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'result',
-                    winner: 'spy',
-                    spyName: spyName
-                });
+                await update(ref(db, 'rooms/' + myRoom), { status: 'result', winner: 'spy', spyName: spyName });
             }
         }
 
         function showSpyGuessScreen(d) {
             hideAllGameScreens();
             document.getElementById('spy-guess-screen').classList.remove('hidden');
-            
-            const spyName = d.players[d.spyIdx];
+            const spyIndices = d.spyIndices || [d.spyIdx];
+            const spyNames   = spyIndices.map(i => d.players[i]).filter(Boolean);
+            const spyName    = spyNames[0] || d.players[d.spyIdx];
             document.getElementById('spyNameDisplay').innerText = spyNames.length > 1 
                     ? `الجواسيس هم: ${spyNames.join(' و ')}` 
                     : `الجاسوس هو: ${spyName}`;
-            
             const categoryWords = gameData[d.category];
             const wordsList = document.getElementById('categoryWordsList');
-            
-            const isSpy = myName === spyName;
+            const isSpy = spyNames.includes(myName);
             const hasGuessed = d.spyGuess !== undefined;
-            
             wordsList.innerHTML = categoryWords.map(word => `
                 <button onclick="spyGuessWord('${word}')" ${!isSpy || hasGuessed ? 'disabled' : ''} 
                     class="glass rounded-xl p-3 border-2 border-cyan-500/30 font-bold text-sm hover:border-cyan-500 disabled:opacity-30 transition-all">
                     ${word}
                 </button>
             `).join('');
-            
             if(hasGuessed) {
                 const correct = d.spyGuess === d.secret;
                 document.getElementById('guessResult').innerHTML = correct ? 
@@ -1040,42 +1001,30 @@ const firebaseConfig = {
         window.spyGuessWord = async (word) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
-            
             const correct = word === d.secret;
-            
             await update(ref(db, 'rooms/' + myRoom), { 
-                spyGuess: word,
-                status: 'result',
+                spyGuess: word, status: 'result',
                 winner: correct ? 'spy' : 'innocents',
                 spyName: d.players[d.spyIdx]
             });
         };
 
         function showResultScreen(d) {
-            // Victory effects
             setTimeout(() => {
                 if (window.SND) {
                     d.winner === 'spy' ? SND.announce.spyWins() : SND.announce.innocentsWin();
                 }
                 if (window.particleSystem) particleSystem.victoryConfetti();
-
-                // Offer screenshot after 2s
                 setTimeout(() => {
                     if (window.SS) {
                         const myIdx    = toArray(d.players).indexOf(myName);
                         const spyIdxs  = d.spyIndices || [d.spyIdx];
                         const spyNames = spyIdxs.map(i => d.players[i]);
                         SS.capture({
-                            winner:   d.winner,
-                            word:     d.secret,
-                            category: d.category,
-                            players:  toArray(d.players).map((name, i) => ({
-                                name, role: spyIdxs.includes(i) ? 'spy' : 'innocent'
-                            })),
-                            myName,
-                            myRole: spyIdxs.includes(myIdx) ? 'spy' : 'innocent',
-                            myWon:  (d.winner === 'spy' && spyIdxs.includes(myIdx)) ||
-                                    (d.winner === 'innocents' && !spyIdxs.includes(myIdx))
+                            winner: d.winner, word: d.secret, category: d.category,
+                            players: toArray(d.players).map((name, i) => ({ name, role: spyIdxs.includes(i) ? 'spy' : 'innocent' })),
+                            myName, myRole: spyIdxs.includes(myIdx) ? 'spy' : 'innocent',
+                            myWon: (d.winner === 'spy' && spyIdxs.includes(myIdx)) || (d.winner === 'innocents' && !spyIdxs.includes(myIdx))
                         });
                     }
                 }, 2000);
@@ -1088,7 +1037,6 @@ const firebaseConfig = {
             const title = document.getElementById('resultTitle');
             const message = document.getElementById('resultMessage');
             
-            // Update stats for all players
             updatePlayerStats(d);
             
             if(d.winner === 'spy') {
@@ -1103,68 +1051,47 @@ const firebaseConfig = {
             
             document.getElementById('returnToRoomBtn').onclick = async () => {
                 hideAllGameScreens();
-                
                 await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'waiting',
-                    turn: 0,
-                    secret: null,
-                    spyIdx: null,
-                    suspects: {},
-                    discussionMessages: [],
-                    readyForVote: [],
-                    votes: {},
-                    tiedPlayers: null,
-                    spyGuess: null,
-                    winner: null,
-                    votedPlayer: null
+                    status: 'waiting', turn: 0, secret: null, spyIdx: null,
+                    suspects: {}, discussionMessages: [], readyForVote: [], votes: {},
+                    tiedPlayers: null, spyGuess: null, winner: null, votedPlayer: null
                 });
-                
                 document.getElementById('room-overlay').classList.remove('hidden');
             };
         }
 
-        // Update player stats after game ends
-        // ── RANKS ───────────────────────────────────────
         const RANKS = [
-            { name:'Bronze',   min:0,     max:999,   css:'rank-bronze' },
-            { name:'Silver',   min:1000,  max:2499,  css:'rank-silver' },
-            { name:'Gold',     min:2500,  max:4999,  css:'rank-gold'   },
-            { name:'Platinum', min:5000,  max:9999,  css:'rank-platinum'},
-            { name:'Diamond',  min:10000, max:Infinity, css:'rank-diamond'}
+            { name:'Bronze',   min:0,     max:999,      css:'rank-bronze'   },
+            { name:'Silver',   min:1000,  max:2499,     css:'rank-silver'   },
+            { name:'Gold',     min:2500,  max:4999,     css:'rank-gold'     },
+            { name:'Platinum', min:5000,  max:9999,     css:'rank-platinum' },
+            { name:'Diamond',  min:10000, max:Infinity, css:'rank-diamond'  }
         ];
         function getRank(pts) { return RANKS.find(r => pts >= r.min && pts <= r.max) || RANKS[0]; }
 
-        // ── ACHIEVEMENTS ────────────────────────────────
         const ACHIEVEMENTS = {
-            firstWin:       { name:'الفوز الأول',       check: s => (s.spyWins+s.innocentWins) >= 1   },
-            masterDeceiver: { name:'خبير الخداع',        check: s => s.spyWins >= 10                  },
-            eagleEye:       { name:'عين الصقر',          check: s => (s.correctVotes||0) >= 5          },
-            centuryClub:    { name:'نادي المئة',         check: s => s.totalGames >= 100              },
-            hotStreak:      { name:'سلسلة نارية',        check: s => (s.currentStreak||0) >= 5        },
-            diamondPlayer:  { name:'لاعب ألماسي',        check: (s,pts) => pts >= 10000               }
+            firstWin:       { name:'الفوز الأول',   check: s => (s.spyWins+s.innocentWins) >= 1 },
+            masterDeceiver: { name:'خبير الخداع',    check: s => s.spyWins >= 10                 },
+            eagleEye:       { name:'عين الصقر',      check: s => (s.correctVotes||0) >= 5         },
+            centuryClub:    { name:'نادي المئة',     check: s => s.totalGames >= 100             },
+            hotStreak:      { name:'سلسلة نارية',    check: s => (s.currentStreak||0) >= 5       },
+            diamondPlayer:  { name:'لاعب ألماسي',   check: (s,pts) => pts >= 10000              }
         };
 
         async function updatePlayerStats(gameData) {
             const winner     = gameData.winner;
             const spyIndices = gameData.spyIndices || [gameData.spyIdx];
             const category   = gameData.category || 'عام';
-
-            // Only update stats for the current logged-in user (avoid quota issues)
             if (!firebase_auth_user) return;
             const uid = firebase_auth_user.uid;
             const myIdx = gameData.players.indexOf(myName);
             if (myIdx === -1) return;
-
             const isSpy = spyIndices.includes(myIdx);
             const won   = (isSpy && winner === 'spy') || (!isSpy && winner === 'innocents');
-
-            // Load current data
             const snap = await get(ref(db, `players/${uid}`));
             const data = snap.exists() ? snap.val() : {};
             const s    = data.stats || {};
             const currentPts = data.rankPoints || 0;
-
-            // ── BUILD NEW STATS ────────────────────────
             const newStats = {
                 totalGames:       (s.totalGames       || 0) + 1,
                 spyWins:          (s.spyWins          || 0) + (isSpy && won ? 1 : 0),
@@ -1175,42 +1102,30 @@ const firebaseConfig = {
                 longestWinStreak: Math.max(s.longestWinStreak || 0, won ? (s.currentStreak || 0) + 1 : 0),
                 lastPlayed:       Date.now()
             };
-
-            // ── COINS EARNED ──────────────────────────
-            let coinsEarned = 5; // participation
+            let coinsEarned = 5;
             if (won)           coinsEarned += isSpy ? 50 : 20;
             if (newStats.currentStreak >= 3) coinsEarned += newStats.currentStreak * 5;
             const newCoins = (data.coins || 0) + coinsEarned;
-
-            // ── RANK POINTS ───────────────────────────
             let ptsEarned = 10;
             if (won) ptsEarned += isSpy ? 100 : 50;
             if (newStats.currentStreak > 1) ptsEarned += newStats.currentStreak * 10;
             const newPts  = currentPts + ptsEarned;
             const newRank = getRank(newPts);
             const oldRank = getRank(currentPts);
-
-            // ── CATEGORY STATS ────────────────────────
             const catStats = data.categoryStats || {};
             catStats[category] = (catStats[category] || 0) + 1;
-
-            // ── GAME HISTORY ──────────────────────────
             const history = data.gameHistory || [];
             history.push({ role: isSpy?'spy':'innocent', won, category, timestamp: Date.now() });
-            if (history.length > 50) history.splice(0, history.length - 50); // keep last 50
-
-            // ── ACHIEVEMENTS ──────────────────────────
+            if (history.length > 50) history.splice(0, history.length - 50);
             const unlocked = data.achievements || {};
             const newlyUnlocked = [];
             for (const [id, ach] of Object.entries(ACHIEVEMENTS)) {
                 if (!unlocked[id] && ach.check(newStats, newPts)) {
                     unlocked[id] = { timestamp: Date.now() };
                     newlyUnlocked.push(ach.name);
-                    coinsEarned += 100; // bonus for achievement
+                    coinsEarned += 100;
                 }
             }
-
-            // ── SAVE ALL ──────────────────────────────
             const updates = {};
             updates[`players/${uid}/stats`]        = newStats;
             updates[`players/${uid}/coins`]        = newCoins;
@@ -1220,21 +1135,14 @@ const firebaseConfig = {
             updates[`players/${uid}/gameHistory`]  = history;
             updates[`players/${uid}/achievements`] = unlocked;
             await update(ref(db), updates);
-
-            // ── NOTIFY PLAYER ─────────────────────────
             setTimeout(() => {
-                // Coins notification
                 if (window.SND) SND.announce.coinsEarned(coinsEarned);
                 if (window.showToast) showToast('🪙 +' + coinsEarned + ' عملة  •  +' + ptsEarned + ' نقطة رتبة');
-
-                // Rank-up notification
                 if (newRank.name !== oldRank.name) {
                     if (window.SND) SND.announce.rankUp(newRank.name);
                     if (window.particleSystem) particleSystem.burst(40, 'particle-victory');
                     setTimeout(() => showToast('🎉 ترقية! أصبحت ' + newRank.name), 2000);
                 }
-
-                // Achievement notifications
                 newlyUnlocked.forEach((name, i) => {
                     setTimeout(() => {
                         if (window.SND) SND.announce.achievement(name);
@@ -1249,7 +1157,7 @@ const firebaseConfig = {
                 .then(() => { if(window.showToast) showToast('📋 تم نسخ الكود: ' + myRoom); })
                 .catch(() => {});
         };
-        // Add QR share button next to room code
+
         const qrShareEl = document.getElementById('roomCodeContainer');
         if (qrShareEl) {
             const qrBtn = document.createElement('button');
@@ -1260,20 +1168,13 @@ const firebaseConfig = {
             qrShareEl.appendChild(qrBtn);
         }
 
-        // Room initialization is triggered by onAuthStateChanged above
-        // to ensure Firebase auth token is ready before RTDB reads
-
-        // ── VOICE CHAT INIT ─────────────────────────
-        // Wait for firebase fns to be available then init voice chat
         setTimeout(() => {
             if (window.VoiceChat && firebase_auth_user) {
-                // Make Firebase functions available for voice chat signaling
                 window._firebaseFns = { ref, push, onChildAdded };
                 window.VC = new VoiceChat(db, myRoom, firebase_auth_user.uid, myName);
             }
         }, 2000);
 
-        // ── HINT SYSTEM ───────────────────────────────
         async function loadHintBalance() {
             if (!firebase_auth_user) return;
             const snap = await get(ref(db, `players/${firebase_auth_user.uid}/hints`));
@@ -1285,16 +1186,12 @@ const firebaseConfig = {
             const snap = await get(ref(db, `players/${firebase_auth_user.uid}/hints`));
             const bal  = snap.val() || 0;
             if (bal < 1) { alert('ليس لديك تلميحات! اشترِ المزيد من المتجر.'); return; }
-            
             const roomSnap = await get(ref(db, 'rooms/' + myRoom));
             const d = roomSnap.val();
             if (!d) return;
-
             const spyIndices = d.spyIndices || [d.spyIdx];
             const spyNames   = spyIndices.map(i => d.players[i]);
             const innocents  = toArray(d.players).filter((_, i) => !spyIndices.includes(i));
-            
-            // Generate varied hints without revealing spy directly
             const hintTypes = [
                 () => `الجاسوس${spyNames.length > 1 ? 'ون' : ''} ${spyNames.length > 1 ? 'في' : 'في'} قائمة اللاعبين`,
                 () => `ليس ${innocents[Math.floor(Math.random() * innocents.length)]} جاسوساً`,
@@ -1302,26 +1199,17 @@ const firebaseConfig = {
                 () => `الجاسوس ليس اللاعب رقم ${(innocents.indexOf(innocents[Math.floor(Math.random()*innocents.length)])) + 1 } في القائمة`,
                 () => `الكلمة السرية تبدأ بحرف "${d.secret ? d.secret[0] : '?'}"`,
             ];
-
             const hint = hintTypes[Math.floor(Math.random() * hintTypes.length)]();
-
-            // Deduct hint
             await update(ref(db, `players/${firebase_auth_user.uid}`), { hints: bal - 1 });
             document.getElementById('hintBalance').innerText = bal - 1;
-
-            // Show hint
             document.getElementById('hint-display').classList.remove('hidden');
             document.getElementById('hint-text').innerText = hint;
-
-            // Broadcast hint to room
             await update(ref(db, 'rooms/' + myRoom), {
                 [`hints/${firebase_auth_user.uid}`]: { hint, usedAt: Date.now(), by: myName }
             });
-
             if (window.SND) SND.play('coins');
         };
 
-        // Show any hints broadcast to room in discussion
         function showRoomHints(d) {
             if (!d.hints) return;
             const vals = Object.values(d.hints);
@@ -1330,7 +1218,12 @@ const firebaseConfig = {
             document.getElementById('hint-display').classList.remove('hidden');
             document.getElementById('hint-text').innerText = last.hint + ' (من ' + (last.by||'لاعب') + ')';
         }
-
     </script>
+    <script src="dialogs.js"></script>
+<script>
+    window.alert   = (msg)             => UIAlert(msg);
+    window.confirm = (msg)             => UIConfirm(msg);
+    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+</script>
 </body>
 </html>

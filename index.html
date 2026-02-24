@@ -222,25 +222,261 @@
             50% { box-shadow: 0 0 60px currentColor; }
         }
 
-        /* Futuristic Sidebar */
+        /* ═══════════════════════════════════════
+           SIDEBAR — DESKTOP & MOBILE FULL-SCREEN
+           ═══════════════════════════════════════ */
+
         #sideNav {
-            background: linear-gradient(180deg, rgba(10, 14, 26, 0.98), rgba(26, 21, 53, 0.98));
-            border-right: 2px solid rgba(0, 242, 255, 0.3);
-            box-shadow: 
-                0 0 50px rgba(0, 242, 255, 0.2),
-                inset -2px 0 20px rgba(0, 242, 255, 0.1);
+            background: linear-gradient(160deg, rgba(8,11,22,0.99) 0%, rgba(18,12,40,0.99) 100%);
+            border-right: 1px solid rgba(0,242,255,0.15);
+            box-shadow: 6px 0 60px rgba(0,0,0,0.7);
         }
 
+        /* Glowing right edge line */
         #sideNav::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,242,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
+            top: 0; right: 0;
+            width: 1px; height: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,242,255,0.4) 30%, rgba(124,48,255,0.4) 70%, transparent 100%);
             pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Nav header brand */
+        #navBrand {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid rgba(0,242,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        #navBrand .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, rgba(0,242,255,0.15), rgba(124,48,255,0.15));
+            border: 1px solid rgba(0,242,255,0.3);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Nav scrollable list */
+        #navList {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px 10px;
+        }
+        #navList::-webkit-scrollbar { width: 3px; }
+        #navList::-webkit-scrollbar-thumb { background: rgba(0,242,255,0.25); border-radius: 2px; }
+
+        /* Nav link items */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: rgba(200,210,230,0.75);
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover { background: rgba(0,242,255,0.07); color: #fff; }
+        .nav-item:hover .nav-item-icon { transform: scale(1.1); }
+
+        .nav-item-icon {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .nav-item-icon.cyan   { color: #00f2ff; background: rgba(0,242,255,0.08); border-color: rgba(0,242,255,0.18); }
+        .nav-item-icon.gold   { color: #fbbf24; background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.18); }
+        .nav-item-icon.green  { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.18); }
+        .nav-item-icon.purple { color: #a78bfa; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.18); }
+        .nav-item-icon.blue   { color: #60a5fa; background: rgba(96,165,250,0.08); border-color: rgba(96,165,250,0.18); }
+        .nav-item-icon.orange { color: #fb923c; background: rgba(251,146,60,0.08); border-color: rgba(251,146,60,0.18); }
+        .nav-item-icon.pink   { color: #f472b6; background: rgba(244,114,182,0.08); border-color: rgba(244,114,182,0.18); }
+
+        .nav-badge {
+            margin-right: auto;
+            padding: 2px 6px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 7px;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+            font-family: 'Orbitron', sans-serif;
+            flex-shrink: 0;
+        }
+
+        .nav-divider-label {
+            padding: 10px 12px 4px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: rgba(255,255,255,0.15);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Discord footer */
+        #navDiscord {
+            padding: 10px;
+            border-top: 1px solid rgba(0,242,255,0.07);
+            flex-shrink: 0;
+        }
+
+        #navDiscord a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(88,101,242,0.15), rgba(124,48,255,0.15));
+            border: 1px solid rgba(88,101,242,0.25);
+            color: #fff;
+            font-weight: 900;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #navDiscord a:hover {
+            background: linear-gradient(135deg, rgba(88,101,242,0.28), rgba(124,48,255,0.28));
+            box-shadow: 0 0 25px rgba(88,101,242,0.35);
+            border-color: rgba(88,101,242,0.5);
+        }
+
+        /* Close button */
+        #closeNav {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            color: rgba(200,210,230,0.55);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-size: 15px;
+            margin-right: auto;
+        }
+
+        #closeNav:hover {
+            background: rgba(0,242,255,0.1);
+            border-color: rgba(0,242,255,0.35);
+            color: #00f2ff;
+        }
+
+        /* Open button */
+        #openNav {
+            background: linear-gradient(135deg, rgba(0,242,255,0.12), rgba(124,48,255,0.12));
+            border: 1px solid rgba(0,242,255,0.32);
+            box-shadow: 0 0 18px rgba(0,242,255,0.12);
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+        }
+
+        #openNav:hover {
+            background: linear-gradient(135deg, rgba(0,242,255,0.2), rgba(124,48,255,0.2));
+            box-shadow: 0 0 28px rgba(0,242,255,0.3);
+            border-color: rgba(0,242,255,0.55);
+            transform: scale(1.06);
+        }
+
+        #openNav:active { transform: scale(0.96); }
+
+        /* Backdrop for mobile */
+        #navBackdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            display: none;
+        }
+
+        #navBackdrop.visible { opacity: 1; pointer-events: all; }
+
+        /* ══ MOBILE: FULL-SCREEN OVERLAY ═══ */
+        @media (max-width: 768px) {
+            #navBackdrop { display: block; }
+
+            #sideNav {
+                width: 100vw !important;
+                height: 100dvh !important;
+                transform: translateX(-100%);
+                /* override JS width style with transform */
+                transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            #sideNav.mobile-open {
+                transform: translateX(0) !important;
+            }
+
+            /* Staggered item entrance */
+            #navBrand,
+            #navList .nav-item,
+            #navList .nav-divider-label,
+            #navDiscord {
+                opacity: 0;
+                transform: translateX(-18px);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+
+            #sideNav.mobile-open #navBrand         { opacity:1; transform:none; transition-delay:0.05s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(1)  { opacity:1; transform:none; transition-delay:0.09s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(2)  { opacity:1; transform:none; transition-delay:0.13s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(3)  { opacity:1; transform:none; transition-delay:0.17s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(4)  { opacity:1; transform:none; transition-delay:0.21s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(5)  { opacity:1; transform:none; transition-delay:0.25s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(6)  { opacity:1; transform:none; transition-delay:0.29s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(7)  { opacity:1; transform:none; transition-delay:0.33s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(8)  { opacity:1; transform:none; transition-delay:0.35s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(9)  { opacity:1; transform:none; transition-delay:0.37s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(10) { opacity:1; transform:none; transition-delay:0.39s; }
+            #sideNav.mobile-open #navList .nav-divider-label      { opacity:1; transform:none; transition-delay:0.37s; }
+            #sideNav.mobile-open #navDiscord                      { opacity:1; transform:none; transition-delay:0.42s; }
+
+            /* Bigger items on mobile fullscreen */
+            .nav-item       { padding: 14px 16px; font-size: 16px; border-radius: 14px; margin-bottom: 3px; }
+            .nav-item-icon  { width: 42px; height: 42px; font-size: 17px; border-radius: 12px; }
+            #navBrand       { padding: 24px 20px 20px; }
+            #navBrand .brand-icon { width: 44px; height: 44px; border-radius: 12px; }
+            #navDiscord a   { padding: 15px; font-size: 15px; border-radius: 14px; }
+
+            /* Safe area spacing at bottom */
+            #navDiscord { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        }
+
+        @media (min-width: 769px) {
+            /* Desktop: pure width-based slide, no transform */
+            #sideNav { transform: none !important; }
         }
 
         /* Hexagon Logo Container */
@@ -461,66 +697,7 @@
             100% { transform: translateY(400px); }
         }
 
-        /* Enhanced Menu Items */
-        #sideNav ul li a {
-            position: relative;
-            overflow: hidden;
-        }
-
-        #sideNav ul li a::before {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-color), transparent);
-            transition: width 0.3s ease;
-            transform: translateY(-50%);
-        }
-
-        #sideNav ul li a:hover::before {
-            width: 100%;
-        }
-
-        /* Discord Button Enhancement */
-        .discord-btn {
-            background: linear-gradient(135deg, #5865F2, #7c30ff);
-            box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .discord-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .discord-btn:hover::after {
-            width: 200%;
-            height: 200%;
-        }
-
-        /* Enhanced Open Nav Button */
-        #openNav {
-            background: linear-gradient(135deg, rgba(0, 242, 255, 0.2), rgba(124, 48, 255, 0.2));
-            border: 2px solid rgba(0, 242, 255, 0.5);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        #openNav:hover {
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
-            border-color: var(--accent-color);
-        }
+        /* (nav item styles moved to sidebar section above) */
 
         /* Footer Enhancement */
         footer {
@@ -559,6 +736,19 @@
             0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)); }
             50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1)); }
         }
+
+        /* Section label divider line */
+.nav-divider-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nav-divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+}
     </style>
 </head>
 <body class="p-4 pb-10">
@@ -626,107 +816,123 @@
         }
     </style>
 
+    <!-- Backdrop (mobile) -->
+    <div id="navBackdrop"></div>
+
     <!-- Sidebar Nav Button -->
-    <button id="openNav" class="fixed left-4 top-4 z-[1100] text-white w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group">
-        <i class="fas fa-bars transition-transform duration-500 group-hover:rotate-180"></i>
+    <button id="openNav" class="fixed left-4 top-4 z-[1100] text-white w-11 h-11 rounded-xl flex items-center justify-center">
+        <i class="fas fa-bars text-base"></i>
     </button>
 
     <!-- Sidebar Navigation -->
-    <nav id="sideNav" class="fixed left-0 top-0 z-[1000] flex h-full w-0 overflow-hidden flex-col transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-2xl">
-        
-        <div class="flex justify-end p-4">
-            <button id="closeNav" class="text-gray-400 hover:text-[#00f2ff] transition-colors">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
+<nav id="sideNav" class="fixed left-0 top-0 z-[1000] flex h-full w-0 overflow-hidden flex-col">
 
-        <div class="relative flex items-center justify-center px-5 py-4 mb-4">
-            <div class="text-center">
-                <i class="fas fa-dragon text-3xl text-[#00f2ff] drop-shadow-[0_0_15px_rgba(0,242,255,0.8)] mb-2 inline-block"></i>
-                <div class="whitespace-nowrap">
-                    <span class="text-lg font-black tracking-widest text-white uppercase" style="font-family: 'Orbitron', sans-serif;">
-                        PhineX <span class="text-[#00f2ff]">|</span> El Jasus
-                    </span>
-                </div>
-            </div>
+    <!-- Brand Header -->
+    <div id="navBrand">
+        <div class="brand-icon">
+            <i class="fas fa-dragon text-lg text-[#00f2ff] drop-shadow-[0_0_8px_rgba(0,242,255,0.8)]"></i>
         </div>
+        <div class="flex-1 min-w-0">
+            <span class="text-sm font-black tracking-widest text-white uppercase block whitespace-nowrap" style="font-family:'Orbitron',sans-serif;">
+                PhineX <span class="text-[#00f2ff]">·</span> El Jasus
+            </span>
+            <span class="text-[10px] text-gray-500 font-bold tracking-wider" style="font-family:'Orbitron',sans-serif;">القائمة الرئيسية</span>
+        </div>
+        <button id="closeNav"><i class="fas fa-times"></i></button>
+    </div>
 
-        <ul class="flex-grow py-2 space-y-1 relative z-10 overflow-y-auto custom-scrollbar px-2" style="max-height: calc(100vh - 250px);">
-            <li>
-                <a href="index.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-home min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">الرئيسية</span>
-                </a>
-            </li>
-            <li>
-                <a href="leaderboard.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl group">
-                    <i class="fas fa-trophy min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">لوحة المتصدرين</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-            </li>
-            <li>
-                <a href="account.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl group">
-                    <i class="fas fa-user-circle min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">حسابي</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-            </li>
-            <li>
-                <a href="login.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-sign-in-alt min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">تسجيل الدخول</span>
-                </a>
-            </li>
-            <li>
-                <a href="signup.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-user-plus min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">انشاء حساب</span>
-                </a>
-            </li>
-            <li>
-                <a href="howtoplay.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-book-open min-w-[30px] text-lg text-[#00f2ff]"></i>
-                    <span class="mr-6 font-bold">كيفية اللعب</span>
-                </a>
-                <a href="friends.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-user-friends min-w-[30px] text-lg text-green-400"></i>
-                    <span class="mr-6 font-bold">الأصدقاء</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-                <a href="shop.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-store min-w-[30px] text-lg text-yellow-400"></i>
-                    <span class="mr-6 font-bold">المتجر</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-                <a href="analytics.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-chart-line min-w-[30px] text-lg text-purple-400"></i>
-                    <span class="mr-6 font-bold">الإحصائيات</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-                <a href="profile.html" class="flex items-center px-5 py-4 text-gray-200 hover:bg-[#00f2ff]/10 transition-all relative rounded-xl">
-                    <i class="fas fa-id-card min-w-[30px] text-lg text-cyan-400"></i>
-                    <span class="mr-6 font-bold">ملفي الشخصي</span>
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse" style="font-family: 'Orbitron', sans-serif;">NEW</span>
-                </a>
-                <div style="padding:8px 20px 4px;"><p style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:3px;color:#222;">الإدارة</p></div>
-                <a href="admin.html" style="display:flex;align-items:center;padding:10px 20px;font-size:12px;font-weight:700;color:#555;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#555'">
-                    <i class="fas fa-cog" style="width:18px;font-size:14px;margin-left:10px;"></i>
-                    لوحة الإدارة
-                </a>
-            </li>
-            <li class="px-3 mt-4">
-                <a href="https://discord.gg/xBQ3ewVVHk" target="_blank" 
-                class="discord-btn group/discord flex items-center justify-center rounded-xl p-3 text-white transition-all duration-300 hover:scale-105 active:scale-95 relative overflow-hidden">
-                    <i class="fab fa-discord text-xl relative z-10"></i>
-                    <span class="mr-3 max-w-0 overflow-hidden opacity-0 transition-all duration-500 group-hover/discord:max-w-xs group-hover/discord:opacity-100 font-black text-[10px] tracking-tighter whitespace-nowrap uppercase relative z-10">
-                        انضم لمجتمعنا
-                    </span>
-                </a>
-            </li>
-        </ul>
-        
-    </nav>
+    <!-- Nav Links -->
+    <div id="navList" class="custom-scrollbar">
+
+        <!-- ─ Main ─ -->
+        <div class="nav-divider-label">الرئيسية</div>
+
+        <a href="index.html" class="nav-item">
+            <span class="nav-item-icon cyan"><i class="fas fa-home"></i></span>
+            <span>الرئيسية</span>
+        </a>
+
+        <a href="leaderboard.html" class="nav-item">
+            <span class="nav-item-icon gold"><i class="fas fa-trophy"></i></span>
+            <span>لوحة المتصدرين</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <a href="howtoplay.html" class="nav-item">
+            <span class="nav-item-icon blue"><i class="fas fa-book-open"></i></span>
+            <span>كيفية اللعب</span>
+        </a>
+
+        <!-- ─ Account ─ -->
+        <div class="nav-divider-label">حسابي</div>
+
+        <a href="account.html" class="nav-item">
+            <span class="nav-item-icon cyan"><i class="fas fa-user-circle"></i></span>
+            <span>حسابي</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <a href="profile.html" class="nav-item">
+            <span class="nav-item-icon pink"><i class="fas fa-id-card"></i></span>
+            <span>ملفي الشخصي</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <a href="friends.html" class="nav-item">
+            <span class="nav-item-icon green"><i class="fas fa-user-friends"></i></span>
+            <span>الأصدقاء</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <a href="analytics.html" class="nav-item">
+            <span class="nav-item-icon purple"><i class="fas fa-chart-line"></i></span>
+            <span>الإحصائيات</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <!-- ─ Store ─ -->
+        <div class="nav-divider-label">المتجر</div>
+
+        <a href="shop.html" class="nav-item">
+            <span class="nav-item-icon gold"><i class="fas fa-store"></i></span>
+            <span>المتجر</span>
+            <span class="nav-badge">NEW</span>
+        </a>
+
+        <!-- ─ Auth ─ -->
+        <div class="nav-divider-label">الدخول</div>
+
+        <a href="login.html" class="nav-item">
+            <span class="nav-item-icon green"><i class="fas fa-sign-in-alt"></i></span>
+            <span>تسجيل الدخول</span>
+        </a>
+
+        <a href="signup.html" class="nav-item">
+            <span class="nav-item-icon purple"><i class="fas fa-user-plus"></i></span>
+            <span>إنشاء حساب</span>
+        </a>
+
+        <!-- ─ Admin ─ -->
+        <div class="nav-divider-label">الإدارة</div>
+
+        <a href="admin.html" class="nav-item">
+            <span class="nav-item-icon orange"><i class="fas fa-cog"></i></span>
+            <span>لوحة الإدارة</span>
+            <span class="nav-badge" style="background:#7f1d1d;color:#fca5a5;">ADMIN</span>
+        </a>
+
+    </div>
+
+    <!-- Discord Footer -->
+    <div id="navDiscord">
+        <a href="https://discord.gg/xBQ3ewVVHk" target="_blank">
+            <i class="fab fa-discord text-xl text-[#5865F2]"></i>
+            <span>انضم لمجتمعنا</span>
+            <i class="fas fa-arrow-left text-xs text-gray-500 mr-auto"></i>
+        </a>
+    </div>
+
+</nav>
 
     <!-- Main Content -->
     <div class="max-w-md mx-auto relative z-10">
@@ -913,6 +1119,13 @@
 
             <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                 <p>&copy; 2026 <span class="text-cyan-500">PhineX</span>. All rights reserved.</p>
+
+                <!-- Community Standards link -->
+                <a href="community.html"
+                   class="flex items-center gap-1.5 text-gray-500 hover:text-cyan-400 hover:drop-shadow-[0_0_6px_#00f2ff] transition-all duration-300">
+                    <i class="fas fa-shield-alt text-[12px]"></i>
+                    <span>معايير المجتمع</span>
+                </a>
                 
                 <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest group">
                     <span>Made with</span>
@@ -955,28 +1168,68 @@
             }, 9000);
         });
 
-        // Sidebar Navigation
-        const sideNav = document.getElementById('sideNav');
-        const openBtn = document.getElementById('openNav');
-        const closeBtn = document.getElementById('closeNav');
+        // ── SIDEBAR NAVIGATION ───────────────────
+        const sideNav    = document.getElementById('sideNav');
+        const openBtn    = document.getElementById('openNav');
+        const closeBtn   = document.getElementById('closeNav');
+        const backdrop   = document.getElementById('navBackdrop');
 
-        openBtn.addEventListener('click', () => {
-            sideNav.style.width = '260px';
-            sideNav.style.borderRightWidth = '2px';
+        const isMobile = () => window.innerWidth <= 768;
+        let navOpen = false;
+
+        function openNav() {
+            navOpen = true;
+            if (isMobile()) {
+                // Full-screen: use transform
+                sideNav.classList.add('mobile-open');
+                backdrop.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Desktop: slide width
+                sideNav.style.width = '260px';
+                sideNav.style.transition = 'width 0.4s cubic-bezier(0.4,0,0.2,1)';
+            }
             openBtn.style.opacity = '0';
             openBtn.style.pointerEvents = 'none';
-        });
+        }
 
-        closeBtn.addEventListener('click', () => {
-            sideNav.style.width = '0';
-            sideNav.style.borderRightWidth = '0';
+        function closeNav() {
+            navOpen = false;
+            if (isMobile()) {
+                sideNav.classList.remove('mobile-open');
+                backdrop.classList.remove('visible');
+                document.body.style.overflow = '';
+            } else {
+                sideNav.style.width = '0';
+            }
             openBtn.style.opacity = '1';
             openBtn.style.pointerEvents = 'auto';
+        }
+
+        openBtn.addEventListener('click', openNav);
+        closeBtn.addEventListener('click', closeNav);
+        backdrop.addEventListener('click', closeNav);
+
+        // Close on outside click (desktop)
+        document.addEventListener('click', (e) => {
+            if (!isMobile() && navOpen && !sideNav.contains(e.target) && !openBtn.contains(e.target)) {
+                closeNav();
+            }
         });
 
-        document.addEventListener('click', (e) => {
-            if (!sideNav.contains(e.target) && !openBtn.contains(e.target) && sideNav.style.width === '260px') {
-                closeBtn.click();
+        // Handle resize between mobile/desktop
+        window.addEventListener('resize', () => {
+            if (!navOpen) return;
+            if (isMobile()) {
+                sideNav.style.width = '';
+                sideNav.classList.add('mobile-open');
+                backdrop.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sideNav.classList.remove('mobile-open');
+                backdrop.classList.remove('visible');
+                document.body.style.overflow = '';
+                sideNav.style.width = '260px';
             }
         });
 
@@ -1005,6 +1258,11 @@ const firebaseConfig = {
         let currentUser = null;
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
+            // Init moderation system and check ban on every load
+            if (window.MOD) {
+                MOD.init(db, user ? user.uid : null, ref, update, get);
+                MOD.checkOnLoad(); // shows ban screen if banned
+            }
         });
 
         const gameData = {
@@ -1127,6 +1385,13 @@ const firebaseConfig = {
         renderLocalInputs();
 
         window.startLocalGame = () => {
+            // ── BAN CHECK ─────────────────────────────────
+            if (window.MOD) {
+            (async () => {
+                const ban = await MOD.checkBan();
+                if (ban) { MOD.checkOnLoad(); return; }
+            })();
+        }
             const names = Array.from(document.querySelectorAll('.local-name-in')).map(i => i.value || "مجهول");
             const cat = document.getElementById('gameCat').value;
             const secret = gameData[cat][Math.floor(Math.random() * gameData[cat].length)];
@@ -1167,6 +1432,12 @@ const firebaseConfig = {
         document.getElementById('createBtn').onclick = async () => {
             myName = document.getElementById('pName').value.trim();
             if(!myName) return alert("الاسم مطلوب");
+            
+            // ── BAN CHECK ─────────────────────────────────
+            if (window.MOD) {
+                const ban = await MOD.checkBan();
+                if (ban) { MOD.checkOnLoad(); return; }
+            }
 
             if (!currentUser) {
                 alert('يجب تسجيل الدخول أولاً لإنشاء غرفة');
@@ -1205,6 +1476,12 @@ const firebaseConfig = {
         document.getElementById('joinBtn').onclick = async () => {
             myName = document.getElementById('pName').value.trim();
             if(!myName) return alert("الاسم مطلوب");
+
+            // ── BAN CHECK ─────────────────────────────────
+            if (window.MOD) {
+                const ban = await MOD.checkBan();
+                if (ban) { MOD.checkOnLoad(); return; }
+            }
 
             if (!currentUser) {
                 alert('يجب تسجيل الدخول أولاً للانضمام لغرفة');
@@ -1407,6 +1684,12 @@ const firebaseConfig = {
     }
     loadAnnouncements();
     </script>
+    <script src="dialogs.js"></script>
+<script>
+    window.alert   = (msg)             => UIAlert(msg);
+    window.confirm = (msg)             => UIConfirm(msg);
+    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+</script>
 
 </body>
 </html>

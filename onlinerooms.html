@@ -25,269 +25,115 @@
             --text-color: #ffffff;
             --accent-color: #00f2ff;
         }
-        
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            min-height: 100vh; 
-        }
-        
-        .glass { 
-            background: var(--card-color); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-        }
-        
-        .room-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .room-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(0, 242, 255, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.1);
-        }
-        
-        .room-card.active {
-            border-color: rgba(0, 242, 255, 0.5);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-        }
-        
-        .join-popup {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: top;
-        }
-        
-        .join-popup.active {
-            max-height: 200px;
-            opacity: 1;
-            margin-top: 1rem;
-        }
-        
-        .connecting-line {
-            position: absolute;
-            width: 2px;
-            height: 0;
-            background: linear-gradient(to bottom, rgba(0, 242, 255, 0.5), transparent);
-            left: 50%;
-            transform: translateX(-50%);
-            transition: height 0.4s ease;
-            z-index: 1;
-        }
-        
-        .connecting-line.active {
-            height: 1rem;
-        }
-        
-        .filter-chip {
-            transition: all 0.3s ease;
-        }
-        
-        .filter-chip.active span {
-            background: linear-gradient(135deg, #00f2ff 0%, #7c30ff 100%);
-            border-color: #00f2ff;
-            color: #000;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 10px;
-        }
-        
-        .category-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        
-        .empty-state {
-            animation: fadeIn 0.6s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .search-bar:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
-        }
-        
-        .player-count-badge {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .player-count-badge::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
-        }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; }
+        .glass { background: var(--card-color); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
+        .room-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); cursor: pointer; position: relative; }
+        .room-card:hover { transform: translateY(-2px); border-color: rgba(0,242,255,0.3); box-shadow: 0 10px 40px rgba(0,242,255,0.1); }
+        .room-card.active { border-color: rgba(0,242,255,0.5); box-shadow: 0 0 30px rgba(0,242,255,0.2); }
+        .join-popup { max-height: 0; opacity: 0; overflow: hidden; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); transform-origin: top; }
+        .join-popup.active { max-height: 200px; opacity: 1; margin-top: 1rem; }
+        .connecting-line { position: absolute; width: 2px; height: 0; background: linear-gradient(to bottom, rgba(0,242,255,0.5), transparent); left: 50%; transform: translateX(-50%); transition: height 0.4s ease; z-index: 1; }
+        .connecting-line.active { height: 1rem; }
+        .filter-chip { transition: all 0.3s ease; }
+        .filter-chip.active span { background: linear-gradient(135deg,#00f2ff 0%,#7c30ff 100%); border-color: #00f2ff; color: #000; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
+        .category-badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; }
+        .empty-state { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .search-bar:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(0,242,255,0.1); }
+        .player-count-badge { position: relative; overflow: hidden; }
+        .player-count-badge::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); transform:translateX(-100%); animation:shimmer 2s infinite; }
+        @keyframes shimmer { 100% { transform:translateX(100%); } }
+        .spinner { width:36px; height:36px; border:3px solid rgba(0,242,255,0.2); border-top-color:#00f2ff; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
+        @keyframes spin { to { transform:rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 pb-20">
-    <!-- Header -->
+
     <header class="max-w-6xl mx-auto mb-6 animate__animated animate__fadeInDown">
         <div class="flex items-center justify-between mb-4">
             <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors group">
                 <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                 <span class="text-sm font-bold">رجوع</span>
             </a>
-            
             <div class="text-center">
                 <h1 class="text-2xl font-black text-white">الغرف العامة</h1>
                 <p class="text-xs text-gray-500 font-bold mt-1">اختر غرفة وابدأ اللعب</p>
-                <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+                <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
                     <span style="font-size:11px;font-weight:700;color:#22c55e;display:flex;align-items:center;gap:5px;">
-                        <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s infinite;"></span>
-                        <span id="online-player-count">0</span> لاعب متصل
+                        <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+                        <span id="online-player-count">-</span> لاعب متصل
                     </span>
                     <span style="font-size:11px;font-weight:700;color:#00f2ff;display:flex;align-items:center;gap:5px;">
-                        🎮 <span id="active-game-count">0</span> مباراة جارية
+                        🎮 <span id="active-game-count">-</span> مباراة جارية
                     </span>
                 </div>
             </div>
-            
             <div class="w-16"></div>
         </div>
     </header>
 
     <div class="max-w-6xl mx-auto">
-        <!-- Search and Filter Section -->
+
         <div class="glass rounded-2xl p-4 mb-6 border border-white/10 animate__animated animate__fadeIn">
-            <!-- Search Bar -->
             <div class="relative mb-4">
                 <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="ابحث عن غرفة بالكود..." 
-                    class="search-bar w-full bg-black/40 border border-white/10 rounded-xl pr-12 pl-4 py-3 text-sm outline-none transition-all"
-                />
+                <input type="text" id="searchInput" placeholder="ابحث عن غرفة بالكود..."
+                    class="search-bar w-full bg-black/40 border border-white/10 rounded-xl pr-12 pl-4 py-3 text-sm outline-none transition-all"/>
             </div>
-            
-            <!-- Filter Toggle Button -->
             <button id="filterToggle" class="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 transition-all group">
                 <div class="flex items-center gap-2">
                     <i class="fas fa-filter text-cyan-400"></i>
                     <span class="text-sm font-bold">فلترة النتائج</span>
                 </div>
-                <i class="fas fa-chevron-down transition-transform group-hover:translate-y-1" id="filterIcon"></i>
+                <i class="fas fa-chevron-down transition-transform" id="filterIcon"></i>
             </button>
-            
-            <!-- Filter Panel -->
             <div id="filterPanel" class="hidden mt-4 space-y-4 animate__animated animate__fadeIn">
-                <!-- Category Filter -->
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase block mb-2">التصنيفات</label>
-                    <div class="flex flex-wrap gap-2" id="categoryFilters">
-                        <button class="filter-chip category-filter" data-category="all">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                🌐 الكل
-                            </span>
-                        </button>
-                        <button class="filter-chip category-filter" data-category="places">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                🌍 أماكن سياحية
-                            </span>
-                        </button>
-                        <button class="filter-chip category-filter" data-category="food">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                🍕 أكلات مصرية
-                            </span>
-                        </button>
-                        <button class="filter-chip category-filter" data-category="jobs">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                🛠️ مهن ووظائف
-                            </span>
-                        </button>
-                        <button class="filter-chip category-filter" data-category="companies">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                🏢 شركات عالمية
-                            </span>
-                        </button>
-                        <button class="filter-chip category-filter" data-category="football_teams">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                ⚽ أندية كورة
-                            </span>
-                        </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-chip category-filter" data-category="all"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">🌐 الكل</span></button>
+                        <button class="filter-chip category-filter" data-category="places"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">🌍 أماكن سياحية</span></button>
+                        <button class="filter-chip category-filter" data-category="food"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">🍕 أكلات مصرية</span></button>
+                        <button class="filter-chip category-filter" data-category="jobs"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">🛠️ مهن ووظائف</span></button>
+                        <button class="filter-chip category-filter" data-category="companies"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">🏢 شركات عالمية</span></button>
+                        <button class="filter-chip category-filter" data-category="football_teams"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">⚽ أندية كورة</span></button>
                     </div>
                 </div>
-                
-                <!-- Player Count Filter -->
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase block mb-2">عدد اللاعبين</label>
-                    <div class="flex flex-wrap gap-2" id="playerFilters">
-                        <button class="filter-chip player-filter" data-players="all">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                الكل
-                            </span>
-                        </button>
-                        <button class="filter-chip player-filter" data-players="available">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                غرف متاحة
-                            </span>
-                        </button>
-                        <button class="filter-chip player-filter" data-players="almost-full">
-                            <span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">
-                                شبه ممتلئة
-                            </span>
-                        </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filter-chip player-filter" data-players="all"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">الكل</span></button>
+                        <button class="filter-chip player-filter" data-players="available"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">غرف متاحة</span></button>
+                        <button class="filter-chip player-filter" data-players="almost-full"><span class="px-4 py-2 rounded-lg border border-white/20 bg-white/5 text-xs font-bold hover:border-cyan-400 transition-all">شبه ممتلئة</span></button>
                     </div>
                 </div>
-                
-                <!-- Clear Filters -->
                 <button id="clearFilters" class="w-full py-2 px-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-xs font-bold text-red-400 transition-all">
-                    <i class="fas fa-times-circle ml-1"></i>
-                    مسح الفلاتر
+                    <i class="fas fa-times-circle ml-1"></i> مسح الفلاتر
                 </button>
             </div>
         </div>
-        
-        <!-- Results Count -->
+
         <div class="flex items-center justify-between mb-4 px-2">
-            <p class="text-xs text-gray-500 font-bold">
-                <span id="roomCount">0</span> غرفة متاحة
-            </p>
+            <p class="text-xs text-gray-500 font-bold"><span id="roomCount">-</span> غرفة متاحة</p>
             <button id="refreshBtn" class="flex items-center gap-2 text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors group">
                 <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i>
                 تحديث
             </button>
         </div>
-        
-        <!-- Rooms List -->
-        <div id="roomsList" class="space-y-4 animate__animated animate__fadeInUp">
-            <!-- Rooms will be dynamically inserted here -->
+
+        <!-- Loading -->
+        <div id="loadingState" class="glass rounded-2xl p-10 text-center border border-white/10">
+            <div class="spinner mb-3"></div>
+            <p class="text-xs text-gray-500 font-bold">جارٍ الاتصال...</p>
         </div>
-        
-        <!-- Empty State -->
+
+        <!-- Rooms -->
+        <div id="roomsList" class="space-y-4 animate__animated animate__fadeInUp"></div>
+
+        <!-- Empty -->
         <div id="emptyState" class="hidden empty-state glass rounded-2xl p-12 text-center border border-white/10">
             <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
                 <i class="fas fa-inbox text-4xl text-gray-600"></i>
@@ -295,279 +141,305 @@
             <h3 class="text-xl font-black text-gray-400 mb-2">لا توجد غرف متاحة</h3>
             <p class="text-sm text-gray-600 mb-6">جرب تغيير الفلاتر أو أنشئ غرفة جديدة</p>
             <a href="index.html" class="inline-block px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-xl text-sm font-bold transition-all">
-                <i class="fas fa-plus-circle ml-2"></i>
-                إنشاء غرفة جديدة
+                <i class="fas fa-plus-circle ml-2"></i> إنشاء غرفة جديدة
             </a>
+        </div>
+
+        <!-- Error -->
+        <div id="errorState" class="hidden glass rounded-2xl p-8 text-center border border-red-500/20">
+            <i class="fas fa-exclamation-triangle text-3xl text-red-400 mb-3 block"></i>
+            <p class="text-sm text-red-400 font-bold mb-1">تعذّر الاتصال بقاعدة البيانات</p>
+            <p id="errorMsg" class="text-xs text-gray-500 mb-4"></p>
+            <button onclick="location.reload()" class="px-6 py-2 bg-red-500/20 border border-red-500/40 rounded-xl text-sm font-bold text-red-400">إعادة المحاولة</button>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+        import { initializeApp }                           from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged }
+                                                           from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getDatabase, ref, onValue }               from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        
-const firebaseConfig = {
-  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-  authDomain: "el-jasus.firebaseapp.com",
-  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "el-jasus",
-  storageBucket: "el-jasus.firebasestorage.app",
-  messagingSenderId: "415659587906",
-  appId: "1:415659587906:web:782f7940176ea4097eb0db",
-  measurementId: "G-N4K79FP56N"
-};
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain:        "el-jasus.firebaseapp.com",
+            databaseURL:       "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId:         "el-jasus",
+            storageBucket:     "el-jasus.firebasestorage.app",
+            messagingSenderId: "415659587906",
+            appId:             "1:415659587906:web:782f7940176ea4097eb0db",
+            measurementId:     "G-N4K79FP56N"
+        };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const app  = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db   = getDatabase(app);
 
-        // Category labels and icons
+        // ── DOM shortcuts ───────────────────────────────────────────────────────
+        const el = id => document.getElementById(id);
+
+        // ── State management ───────────────────────────────────────────────────
+        function showLoading() {
+            el('loadingState').classList.remove('hidden');
+            el('emptyState').classList.add('hidden');
+            el('errorState').classList.add('hidden');
+            el('roomsList').innerHTML = '';
+        }
+        function showEmpty() {
+            el('loadingState').classList.add('hidden');
+            el('emptyState').classList.remove('hidden');
+            el('errorState').classList.add('hidden');
+        }
+        function showError(msg) {
+            el('loadingState').classList.add('hidden');
+            el('emptyState').classList.add('hidden');
+            el('errorState').classList.remove('hidden');
+            el('errorMsg').textContent = msg || '';
+        }
+        function hideAllStates() {
+            el('loadingState').classList.add('hidden');
+            el('emptyState').classList.add('hidden');
+            el('errorState').classList.add('hidden');
+        }
+
+        // ── Categories ─────────────────────────────────────────────────────────
         const categoryLabels = {
-            places: { label: "أماكن سياحية", icon: "🌍", color: "from-green-500/20 to-emerald-500/20 border-green-500/30" },
-            food: { label: "أكلات مصرية", icon: "🍕", color: "from-orange-500/20 to-red-500/20 border-orange-500/30" },
-            jobs: { label: "مهن ووظائف", icon: "🛠️", color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30" },
-            companies: { label: "شركات عالمية", icon: "🏢", color: "from-purple-500/20 to-pink-500/20 border-purple-500/30" },
-            football_teams: { label: "أندية كورة", icon: "⚽", color: "from-yellow-500/20 to-green-500/20 border-yellow-500/30" }
+            places:         { label:"أماكن سياحية",  icon:"🌍", color:"from-green-500/20 to-emerald-500/20 border-green-500/30"  },
+            food:           { label:"أكلات مصرية",   icon:"🍕", color:"from-orange-500/20 to-red-500/20 border-orange-500/30"    },
+            jobs:           { label:"مهن ووظائف",    icon:"🛠️", color:"from-blue-500/20 to-cyan-500/20 border-blue-500/30"       },
+            companies:      { label:"شركات عالمية",  icon:"🏢", color:"from-purple-500/20 to-pink-500/20 border-purple-500/30"   },
+            football_teams: { label:"أندية كورة",    icon:"⚽", color:"from-yellow-500/20 to-green-500/20 border-yellow-500/30" }
         };
+        const defaultCategory = { label:"عامة", icon:"🎮", color:"from-cyan-500/20 to-blue-500/20 border-cyan-500/30" };
 
-        let allRooms = [];
+        // ── Data ───────────────────────────────────────────────────────────────
+        let allRooms      = [];
         let filteredRooms = [];
-        let activeFilters = {
-            category: 'all',
-            players: 'all',
-            search: ''
-        };
-        let activeRoomId = null;
+        let activeFilters = { category:'all', players:'all', search:'' };
+        let activeRoomId  = null;
+        let listenersStarted = false;
 
-        // Monitor public rooms from Firebase
-        // Count online players via presence
-        onValue(ref(db, 'players'), (snap) => {
-            if (!snap.exists()) return;
-            const players = snap.val();
-            const onlineCount = Object.values(players).filter(p => p.presence?.online).length;
-            const el = document.getElementById('online-player-count');
-            if (el) el.textContent = onlineCount;
-        });
+        function getPlayerCount(room) {
+            if (Array.isArray(room.players))                      return room.players.filter(Boolean).length;
+            if (room.players && typeof room.players === 'object') return Object.keys(room.players).length;
+            if (typeof room.playerCount === 'number')             return room.playerCount;
+            return 0;
+        }
 
-        onValue(ref(db, 'rooms'), (snapshot) => {
-    // Count active games
-    const rooms = snapshot.val() || {};
-    const activeGames = Object.values(rooms).filter(r => r.status === 'playing').length;
-    const el = document.getElementById('active-game-count');
-    if (el) el.textContent = activeGames;
+        // ── Start listeners (only after auth) ──────────────────────────────────
+        function startListeners() {
+            if (listenersStarted) return;
+            listenersStarted = true;
 
-    allRooms = [];
-    
-    if (rooms) {
-        Object.keys(rooms).forEach(code => {
-            const room = rooms[code];
-            if (room.visibility === 'public' && room.status === 'waiting') {
-                allRooms.push({
-                    code: code,
-                    category: room.category,
-                    playerCount: room.players ? room.players.length : 0,
-                    maxPlayers: 10,
-                    host: room.host
+            // Online players
+            onValue(ref(db, 'players'), snap => {
+                let count = 0;
+                if (snap.exists()) {
+                    count = Object.values(snap.val()).filter(p => p?.presence?.online).length;
+                }
+                el('online-player-count').textContent = count;
+            }, err => {
+                console.warn('[onlinerooms] players read error:', err.code);
+                el('online-player-count').textContent = '?';
+            });
+
+            // Rooms  ← THE KEY LISTENER
+            onValue(ref(db, 'rooms'), snap => {
+                const rooms = snap.val() || {};
+                console.log('[onlinerooms] rooms snapshot. Total keys:', Object.keys(rooms).length);
+
+                // Count active games
+                const activeGames = Object.values(rooms).filter(r => r?.status === 'playing').length;
+                el('active-game-count').textContent = activeGames;
+
+                allRooms = [];
+
+                Object.keys(rooms).forEach(code => {
+                    const room = rooms[code];
+                    if (!room) return;
+
+                    // Public check — support several possible field names
+                    const isPublic =
+                        room.visibility === 'public' ||
+                        room.isPublic   === true      ||
+                        room.type       === 'public';
+
+                    // Waiting check — treat missing status as "waiting"
+                    const isWaiting =
+                        !room.status              ||
+                        room.status === 'waiting' ||
+                        room.status === 'lobby';
+
+                    console.log(`[room ${code}] visibility=${room.visibility} status=${room.status} → public=${isPublic} waiting=${isWaiting}`);
+
+                    if (isPublic && isWaiting) {
+                        allRooms.push({
+                            code,
+                            category:    room.category  || null,
+                            playerCount: getPlayerCount(room),
+                            maxPlayers:  room.maxPlayers || 10,
+                            host:        room.host       || 'مجهول'
+                        });
+                    }
                 });
+
+                console.log('[onlinerooms] rooms to display:', allRooms.length);
+                applyFilters();
+
+            }, err => {
+                console.error('[onlinerooms] rooms read FAILED:', err.code, err.message);
+                showError(err.code + ': ' + err.message);
+            });
+        }
+
+        // ── Auth: sign in (anonymously if needed) then start listeners ─────────
+        //    This mirrors the pattern used in room.html (onAuthStateChanged gate)
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                console.log('[onlinerooms] Auth OK uid=' + user.uid);
+                startListeners();
+            } else {
+                console.log('[onlinerooms] No session – signing in anonymously...');
+                signInAnonymously(auth)
+                    .then(() => { /* onAuthStateChanged will fire again with the user */ })
+                    .catch(err => {
+                        console.warn('[onlinerooms] Anonymous auth failed:', err.code, '– trying unauthenticated read');
+                        startListeners(); // attempt read anyway (open rules)
+                    });
             }
         });
-    }
-    
-    applyFilters();
-});
 
-        // Apply filters and search
+        // ── Filter & render ────────────────────────────────────────────────────
         function applyFilters() {
             filteredRooms = allRooms.filter(room => {
-                // Search filter
-                if (activeFilters.search && !room.code.toLowerCase().includes(activeFilters.search.toLowerCase())) {
-                    return false;
-                }
-                
-                // Category filter
-                if (activeFilters.category !== 'all' && room.category !== activeFilters.category) {
-                    return false;
-                }
-                
-                // Player count filter
-                if (activeFilters.players === 'available' && room.playerCount >= room.maxPlayers) {
-                    return false;
-                }
-                if (activeFilters.players === 'almost-full' && room.playerCount < 7) {
-                    return false;
-                }
-                
+                if (activeFilters.search && !room.code.toLowerCase().includes(activeFilters.search.toLowerCase())) return false;
+                if (activeFilters.category !== 'all' && room.category !== activeFilters.category) return false;
+                if (activeFilters.players === 'available'   && room.playerCount >= room.maxPlayers) return false;
+                if (activeFilters.players === 'almost-full' && room.playerCount < 7)               return false;
                 return true;
             });
-            
             renderRooms();
         }
 
-        // Render rooms
         function renderRooms() {
-            const roomsList = document.getElementById('roomsList');
-            const emptyState = document.getElementById('emptyState');
-            const roomCount = document.getElementById('roomCount');
-            
-            roomCount.textContent = filteredRooms.length;
-            
+            el('roomCount').textContent = filteredRooms.length;
+
             if (filteredRooms.length === 0) {
-                roomsList.innerHTML = '';
-                emptyState.classList.remove('hidden');
+                el('roomsList').innerHTML = '';
+                showEmpty();
                 return;
             }
-            
-            emptyState.classList.add('hidden');
-            
-            roomsList.innerHTML = filteredRooms.map(room => {
-                const categoryInfo = categoryLabels[room.category];
-                const percentage = (room.playerCount / room.maxPlayers) * 100;
-                const isAlmostFull = percentage >= 70;
-                const isFull = room.playerCount >= room.maxPlayers;
-                
+
+            hideAllStates();
+
+            el('roomsList').innerHTML = filteredRooms.map(room => {
+                const cat          = categoryLabels[room.category] || defaultCategory;
+                const pct          = (room.playerCount / room.maxPlayers) * 100;
+                const isAlmostFull = pct >= 70;
+                const isFull       = room.playerCount >= room.maxPlayers;
+
                 return `
-                    <div class="room-container" data-room-id="${room.code}">
-                        <div class="room-card glass rounded-2xl p-4 border border-white/10" onclick="toggleRoomDetails('${room.code}')">
-                            <div class="flex items-center justify-between gap-4">
-                                <!-- Room Code -->
-                                <div class="flex-shrink-0">
-                                    <div class="text-center">
-                                        <p class="text-xs text-gray-500 font-bold mb-1">الكود</p>
-                                        <div class="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-                                            <p class="text-lg font-black text-cyan-400 tracking-wider">${room.code}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Category Badge -->
-                                <div class="flex-1">
-                                    <div class="category-badge bg-gradient-to-br ${categoryInfo.color} border">
-                                        <span class="text-xl">${categoryInfo.icon}</span>
-                                        <span>${categoryInfo.label}</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Player Count -->
-                                <div class="flex-shrink-0">
-                                    <div class="player-count-badge relative px-4 py-2 bg-white/5 border ${isFull ? 'border-red-500/50' : isAlmostFull ? 'border-yellow-500/50' : 'border-white/20'} rounded-lg">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-users ${isFull ? 'text-red-500' : isAlmostFull ? 'text-yellow-500' : 'text-cyan-400'}"></i>
-                                            <span class="text-sm font-black ${isFull ? 'text-red-500' : 'text-white'}">${room.playerCount}/${room.maxPlayers}</span>
-                                        </div>
-                                        ${isFull ? '<p class="text-[8px] text-red-400 font-bold mt-1">ممتلئة</p>' : ''}
-                                    </div>
-                                </div>
-                                
-                                <!-- Arrow Icon -->
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-chevron-down text-gray-500 transition-transform room-arrow-${room.code}"></i>
+                <div class="room-container" data-room-id="${room.code}">
+                    <div class="room-card glass rounded-2xl p-4 border border-white/10" onclick="toggleRoomDetails('${room.code}')">
+                        <div class="flex items-center justify-between gap-4">
+
+                            <div class="flex-shrink-0 text-center">
+                                <p class="text-xs text-gray-500 font-bold mb-1">الكود</p>
+                                <div class="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                                    <p class="text-lg font-black text-cyan-400 tracking-wider">${room.code}</p>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Connecting Line -->
-                        <div class="connecting-line connecting-line-${room.code}"></div>
-                        
-                        <!-- Join Popup -->
-                        <div class="join-popup join-popup-${room.code} relative">
-                            <div class="glass rounded-2xl p-6 border border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-transparent">
-                                <div class="text-center mb-4">
-                                    <h3 class="text-lg font-black text-white mb-1">غرفة ${room.code}</h3>
-                                    <p class="text-xs text-gray-400">المضيف: <span class="text-cyan-400 font-bold">${room.host}</span></p>
+
+                            <div class="flex-1">
+                                <div class="category-badge bg-gradient-to-br ${cat.color} border">
+                                    <span class="text-xl">${cat.icon}</span>
+                                    <span>${cat.label}</span>
                                 </div>
-                                
-                                <div class="flex gap-3">
-                                    <button onclick="joinRoom('${room.code}')" ${isFull ? 'disabled' : ''} class="flex-1 ${isFull ? 'bg-gray-600 cursor-not-allowed' : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'} py-3 rounded-xl font-black text-sm transition-all ${!isFull ? 'hover:scale-105 hover:shadow-[0_0_30px_rgba(0,242,255,0.3)]' : ''}">
-                                        <i class="fas fa-${isFull ? 'lock' : 'sign-in-alt'} ml-2"></i>
-                                        ${isFull ? 'ممتلئة' : 'انضمام للغرفة'}
-                                    </button>
-                    <button onclick="if(window.QR)QR.generate('${room.code}')" title="شارك رمز QR"
-                        style="padding:10px 12px;border-radius:10px;background:rgba(0,242,255,.1);
-                        border:2px solid rgba(0,242,255,.3);color:#00f2ff;cursor:pointer;font-size:14px;
-                        flex-shrink:0;" title="مشاركة QR">📲
-                                    
-                                    <button onclick="copyRoomCode('${room.code}')" class="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/50 rounded-xl transition-all group">
-                                        <i class="fas fa-copy text-gray-400 group-hover:text-cyan-400"></i>
-                                    </button>
+                            </div>
+
+                            <div class="flex-shrink-0">
+                                <div class="player-count-badge relative px-4 py-2 bg-white/5 border ${isFull ? 'border-red-500/50' : isAlmostFull ? 'border-yellow-500/50' : 'border-white/20'} rounded-lg">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-users ${isFull ? 'text-red-500' : isAlmostFull ? 'text-yellow-500' : 'text-cyan-400'}"></i>
+                                        <span class="text-sm font-black ${isFull ? 'text-red-500' : 'text-white'}">${room.playerCount}/${room.maxPlayers}</span>
+                                    </div>
+                                    ${isFull ? '<p class="text-[8px] text-red-400 font-bold mt-1">ممتلئة</p>' : ''}
                                 </div>
+                            </div>
+
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chevron-down text-gray-500 transition-transform room-arrow-${room.code}"></i>
                             </div>
                         </div>
                     </div>
-                `;
+
+                    <div class="connecting-line connecting-line-${room.code}"></div>
+
+                    <div class="join-popup join-popup-${room.code} relative">
+                        <div class="glass rounded-2xl p-6 border border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-transparent">
+                            <div class="text-center mb-4">
+                                <h3 class="text-lg font-black text-white mb-1">غرفة ${room.code}</h3>
+                                <p class="text-xs text-gray-400">المضيف: <span class="text-cyan-400 font-bold">${room.host}</span></p>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="joinRoom('${room.code}')" ${isFull ? 'disabled' : ''}
+                                    class="flex-1 ${isFull ? 'bg-gray-600 cursor-not-allowed' : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'} py-3 rounded-xl font-black text-sm transition-all ${!isFull ? 'hover:scale-105 hover:shadow-[0_0_30px_rgba(0,242,255,0.3)]' : ''}">
+                                    <i class="fas fa-${isFull ? 'lock' : 'sign-in-alt'} ml-2"></i>
+                                    ${isFull ? 'ممتلئة' : 'انضمام للغرفة'}
+                                </button>
+                                <button onclick="if(window.QR) QR.generate('${room.code}')" title="شارك رمز QR"
+                                    style="padding:10px 12px;border-radius:10px;background:rgba(0,242,255,.1);border:2px solid rgba(0,242,255,.3);color:#00f2ff;cursor:pointer;font-size:14px;flex-shrink:0;">📲</button>
+                                <button onclick="copyRoomCode('${room.code}')" class="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/50 rounded-xl transition-all group">
+                                    <i class="fas fa-copy text-gray-400 group-hover:text-cyan-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
-        // Toggle room details
+        // ── UI interactions ─────────────────────────────────────────────────────
         window.toggleRoomDetails = function(roomId) {
             const wasActive = activeRoomId === roomId;
-            
-            // Close all popups
-            document.querySelectorAll('.join-popup').forEach(popup => {
-                popup.classList.remove('active');
-            });
-            document.querySelectorAll('.connecting-line').forEach(line => {
-                line.classList.remove('active');
-            });
-            document.querySelectorAll('.room-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            document.querySelectorAll('[class*="room-arrow-"]').forEach(arrow => {
-                arrow.style.transform = 'rotate(0deg)';
-            });
-            
+            document.querySelectorAll('.join-popup').forEach(p      => p.classList.remove('active'));
+            document.querySelectorAll('.connecting-line').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.room-card').forEach(c       => c.classList.remove('active'));
+            document.querySelectorAll('[class*="room-arrow-"]').forEach(a => a.style.transform = 'rotate(0deg)');
             if (!wasActive) {
-                // Open clicked popup
-                document.querySelector(`.join-popup-${roomId}`).classList.add('active');
-                document.querySelector(`.connecting-line-${roomId}`).classList.add('active');
-                document.querySelector(`[data-room-id="${roomId}"] .room-card`).classList.add('active');
-                document.querySelector(`.room-arrow-${roomId}`).style.transform = 'rotate(180deg)';
+                document.querySelector(`.join-popup-${roomId}`)?.classList.add('active');
+                document.querySelector(`.connecting-line-${roomId}`)?.classList.add('active');
+                document.querySelector(`[data-room-id="${roomId}"] .room-card`)?.classList.add('active');
+                const arrow = document.querySelector(`.room-arrow-${roomId}`);
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
                 activeRoomId = roomId;
             } else {
                 activeRoomId = null;
             }
         };
 
-        // Join room function
         window.joinRoom = function(roomCode) {
             const myName = localStorage.getItem('eljasus_user_name');
-            if (!myName) {
-                alert('يجب إدخال اسمك أولاً من الصفحة الرئيسية');
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!myName) { alert('يجب إدخال اسمك أولاً من الصفحة الرئيسية'); window.location.href = 'index.html'; return; }
             localStorage.setItem('pendingRoomJoin', roomCode);
             localStorage.setItem('currentRoom', roomCode);
             window.location.href = 'room.html';
         };
 
-        // Copy room code
         window.copyRoomCode = function(code) {
             navigator.clipboard.writeText(code);
-            
-            // Show feedback
             const btn = event.target.closest('button');
-            const originalHTML = btn.innerHTML;
+            const orig = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check text-green-400"></i>';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalHTML;
-            }, 1500);
+            setTimeout(() => { btn.innerHTML = orig; }, 1500);
         };
 
-        // Filter toggle
-        document.getElementById('filterToggle').addEventListener('click', () => {
-            const panel = document.getElementById('filterPanel');
-            const icon = document.getElementById('filterIcon');
-            
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                panel.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
-            }
+        el('filterToggle').addEventListener('click', () => {
+            const panel  = el('filterPanel'), icon = el('filterIcon');
+            const hidden = panel.classList.toggle('hidden');
+            icon.style.transform = hidden ? 'rotate(0deg)' : 'rotate(180deg)';
         });
 
-        // Category filters
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.category-filter').forEach(b => b.classList.remove('active'));
@@ -577,7 +449,6 @@ const firebaseConfig = {
             });
         });
 
-        // Player filters
         document.querySelectorAll('.player-filter').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.player-filter').forEach(b => b.classList.remove('active'));
@@ -587,59 +458,45 @@ const firebaseConfig = {
             });
         });
 
-        // Search input
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            activeFilters.search = e.target.value;
-            applyFilters();
-        });
+        el('searchInput').addEventListener('input', e => { activeFilters.search = e.target.value; applyFilters(); });
 
-        // Clear filters
-        document.getElementById('clearFilters').addEventListener('click', () => {
-            activeFilters = { category: 'all', players: 'all', search: '' };
-            document.getElementById('searchInput').value = '';
-            document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+        el('clearFilters').addEventListener('click', () => {
+            activeFilters = { category:'all', players:'all', search:'' };
+            el('searchInput').value = '';
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             document.querySelector('[data-category="all"]').classList.add('active');
             document.querySelector('[data-players="all"]').classList.add('active');
             applyFilters();
         });
 
-        // Refresh button
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            const btn = document.getElementById('refreshBtn');
-            btn.querySelector('i').classList.add('fa-spin');
-            
-            setTimeout(() => {
-                btn.querySelector('i').classList.remove('fa-spin');
-            }, 1000);
+        el('refreshBtn').addEventListener('click', () => {
+            const icon = el('refreshBtn').querySelector('i');
+            icon.classList.add('fa-spin');
+            setTimeout(() => icon.classList.remove('fa-spin'), 1000);
         });
 
-        // Set default active filters
         document.querySelector('[data-category="all"]').classList.add('active');
         document.querySelector('[data-players="all"]').classList.add('active');
 
-        // Auto-join from QR code URL param
+        // Auto-join from QR URL param
         const urlParams = new URLSearchParams(window.location.search);
         const joinCode  = urlParams.get('join');
         if (joinCode) {
-            const searchInput = document.getElementById('searchInput') || document.querySelector('input[placeholder*="غرفة"]');
-            if (searchInput) { searchInput.value = joinCode; searchInput.dispatchEvent(new Event('input')); }
-            setTimeout(() => joinRoom(joinCode), 1000);
+            el('searchInput').value = joinCode;
+            el('searchInput').dispatchEvent(new Event('input'));
+            setTimeout(() => window.joinRoom(joinCode), 1500);
         }
-
     </script>
+
     <link rel="stylesheet" href="mobile.css">
     <script src="sound-system.js" defer></script>
+    <script src="dialogs.js"></script>
+<script>
+    window.alert   = (msg)             => UIAlert(msg);
+    window.confirm = (msg)             => UIConfirm(msg);
+    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+</script>
     <script src="qr-notifications.js" defer></script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
-    <!-- Mobile Bottom Nav -->
-    <nav id="mobile-nav">
-        <ul>
-            <li><a href="index.html"><i class="fas fa-home"></i>الرئيسية</a></li>
-            <li><a href="onlinerooms.html" class="active"><i class="fas fa-gamepad"></i>اللعب</a></li>
-            <li><a href="friends.html"><i class="fas fa-users"></i>الأصدقاء</a></li>
-            <li><a href="shop.html"><i class="fas fa-store"></i>المتجر</a></li>
-            <li><a href="account.html"><i class="fas fa-user"></i>حسابي</a></li>
-        </ul>
-    </nav>
 </body>
 </html>

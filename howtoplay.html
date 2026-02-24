@@ -470,5 +470,11 @@
 
         window.onload = () => switchRole('innocent');
     </script>
+    <script src="dialogs.js"></script>
+<script>
+    window.alert   = (msg)             => UIAlert(msg);
+    window.confirm = (msg)             => UIConfirm(msg);
+    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+</script>
 </body>
 </html>

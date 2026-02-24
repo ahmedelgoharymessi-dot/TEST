@@ -476,18 +476,92 @@
                 
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="regPassword" placeholder="••••••••" required>
+                    <input type="password" id="regPassword" placeholder="••••••••••••" required>
                 </div>
                 
                 <div class="form-group">
                     <label>تأكيد كلمة المرور</label>
-                    <input type="password" id="confirmPassword" placeholder="••••••••" required>
+                    <input type="password" id="confirmPassword" placeholder="••••••••••••" required>
                 </div>
+
+                <label class="checkbox-container" style="margin-top:-8px;margin-bottom:8px;">
+                    <input type="checkbox" id="showPasswordToggle" onchange="
+                        var t=this.checked?'text':'password';
+                        document.getElementById('regPassword').type=t;
+                        document.getElementById('confirmPassword').type=t;
+                        document.getElementById('eyeIconSignup').className=this.checked?'fas fa-eye-slash':'fas fa-eye';
+                    ">
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-label" style="display:flex;align-items:center;gap:6px;">
+                        <i id="eyeIconSignup" class="fas fa-eye" style="color:#00f2ff;font-size:14px;"></i>
+                        إظهار كلمة المرور
+                    </span>
+                </label>
                 
                 <label class="checkbox-container">
                     <input type="checkbox" id="dontShowAgain" required>
                     <span class="custom-checkbox"></span>
-                    <span class="checkbox-label">أوافق على الشروط والأحكام</span>
+                    <span class="checkbox-label">أوافق على </span><a href="community.html" class="community-link">شروط و معايير المجتمع<span class="link-underline"></span></a>
+
+<style>
+.checkbox-label {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+}
+
+.community-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 900;
+    font-family: 'Cairo', sans-serif;
+    color: #00f2ff;
+    text-decoration: none;
+    padding: 1px 6px 1px 4px;
+    border-radius: 5px;
+    background: rgba(0, 242, 255, 0.07);
+    border: 1px solid rgba(0, 242, 255, 0.25);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+/* shield icon via pseudo */
+.community-link::before {
+    content: '🛡️';
+    font-size: 11px;
+    line-height: 1;
+}
+
+/* animated underline */
+.link-underline {
+    position: absolute;
+    bottom: -1px;
+    right: 0;
+    height: 1px;
+    width: 0%;
+    background: linear-gradient(90deg, transparent, #00f2ff);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+
+.community-link:hover {
+    color: #fff;
+    background: rgba(0, 242, 255, 0.15);
+    border-color: rgba(0, 242, 255, 0.6);
+    box-shadow:
+        0 0 12px rgba(0, 242, 255, 0.3),
+        inset 0 0 10px rgba(0, 242, 255, 0.05);
+    text-shadow: 0 0 8px rgba(0, 242, 255, 0.8);
+}
+
+.community-link:hover .link-underline {
+    width: 100%;
+}
+</style>
                 </label>
 
                 <button type="submit" class="btn-primary" id="registerBtn">

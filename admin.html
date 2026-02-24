@@ -10,6 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="dialogs.js"></script>
+    <script src="moderation.js"></script>
+    <script>
+        // Override native browser dialogs with styled versions
+        // (runs after dialogs.js loads synchronously)
+        document.addEventListener('DOMContentLoaded', () => {
+            window.alert   = (msg)             => UIAlert(msg);
+            window.confirm = (msg)             => UIConfirm(msg);
+            window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+        });
+    </script>
     <style>
         :root{--primary:#00f2ff;--secondary:#7c30ff;--bg:#0a0e1a;}
         *{box-sizing:border-box;}
@@ -84,6 +95,54 @@
         ::-webkit-scrollbar{width:4px;}
         ::-webkit-scrollbar-track{background:transparent;}
         ::-webkit-scrollbar-thumb{background:rgba(0,242,255,.2);border-radius:2px;}
+
+        /* ── DIAGNOSTICS ──────────────────────── */
+        .test-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 11px 14px; border-radius: 10px;
+            margin-bottom: 6px; font-size: 12px;
+            border: 1px solid transparent;
+            animation: testFadeIn .25s ease;
+            transition: all .2s;
+        }
+        .test-item:hover { filter: brightness(1.08); }
+        @keyframes testFadeIn {
+            from { opacity:0; transform: translateX(8px); }
+            to   { opacity:1; transform: translateX(0); }
+        }
+        .test-major  { background:rgba(239,68,68,.1);  border-color:rgba(239,68,68,.3);  color:#fca5a5; }
+        .test-error  { background:rgba(249,115,22,.1); border-color:rgba(249,115,22,.3); color:#fdba74; }
+        .test-warning{ background:rgba(251,191,36,.08); border-color:rgba(251,191,36,.25); color:#fde68a; }
+        .test-pass   { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.2);  color:#86efac; }
+        .test-info   { background:rgba(0,242,255,.07); border-color:rgba(0,242,255,.2);  color:#a5f3fc; }
+        .test-running{ background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.1); color:#888; }
+        .test-icon   { width:20px; text-align:center; flex-shrink:0; margin-top:1px; font-size:14px; }
+        .test-name   { font-weight:900; margin-bottom:2px; }
+        .test-detail { font-size:11px; opacity:.7; line-height:1.5; }
+
+        .severity-counter {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 10px;
+            font-size:12px; font-weight:900;
+        }
+        .sev-major  { background:rgba(239,68,68,.12); color:#ef4444; border:1px solid rgba(239,68,68,.3); }
+        .sev-error  { background:rgba(249,115,22,.12); color:#f97316; border:1px solid rgba(249,115,22,.3); }
+        .sev-warning{ background:rgba(251,191,36,.1);  color:#fbbf24; border:1px solid rgba(251,191,36,.3); }
+        .sev-pass   { background:rgba(34,197,94,.1);   color:#22c55e; border:1px solid rgba(34,197,94,.3); }
+
+        .test-progress-bar {
+            height: 4px; border-radius: 2px;
+            background: linear-gradient(90deg, #00f2ff, #7c30ff);
+            transition: width .3s ease;
+        }
+        .pulse-dot {
+            width:8px; height:8px; border-radius:50%;
+            animation: pulseDot 1s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%,100% { transform: scale(1); opacity:1; }
+            50% { transform: scale(1.4); opacity:.5; }
+        }
     </style>
 </head>
 <body>
@@ -110,6 +169,9 @@
 
     <div class="nav-section">الأمان</div>
     <div class="nav-item" onclick="showSection('admin-access')"><i class="fas fa-user-shield"></i> صلاحيات الإدارة</div>
+
+    <div class="nav-section">أدوات</div>
+    <div class="nav-item" onclick="showSection('diagnostics')"><i class="fas fa-flask"></i> تشخيص النظام <span id="diag-badge" style="margin-right:auto;background:#f97316;color:white;font-size:9px;padding:2px 7px;border-radius:10px;display:none;">!</span></div>
 
     <div style="flex:1;"></div>
     <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,.05);">
@@ -390,6 +452,120 @@
         </div>
     </section>
 
+    <!-- ── DIAGNOSTICS TEST WINDOW ───────────── -->
+    <section id="section-diagnostics" class="section">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div>
+                <h2 style="font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;color:#00f2ff;">
+                    <i class="fas fa-flask ml-2" style="color:#a855f7;"></i>تشخيص النظام
+                </h2>
+                <p style="font-size:12px;color:#555;" id="diag-last-run">لم يتم التشغيل بعد</p>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <button class="btn-primary" id="run-tests-btn" onclick="runDiagnostics()">
+                    <i class="fas fa-play ml-2"></i>تشغيل الفحص
+                </button>
+                <button class="btn-sm" onclick="clearDiagnostics()" style="padding:10px 18px;">
+                    <i class="fas fa-trash ml-2"></i>مسح
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary counters -->
+        <div class="flex gap-3 mb-6 flex-wrap" id="diag-summary" style="display:none!important;">
+            <div class="severity-counter sev-major"><span id="cnt-major">0</span> خطأ جسيم</div>
+            <div class="severity-counter sev-error"><span id="cnt-error">0</span> خطأ</div>
+            <div class="severity-counter sev-warning"><span id="cnt-warning">0</span> تحذير</div>
+            <div class="severity-counter sev-pass"><span id="cnt-pass">0</span> ناجح</div>
+        </div>
+
+        <!-- Progress bar -->
+        <div id="diag-progress-wrap" style="display:none;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px;">
+                <span id="diag-progress-label">جاري الفحص...</span>
+                <span id="diag-progress-pct">0%</span>
+            </div>
+            <div style="background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;height:4px;">
+                <div class="test-progress-bar" id="diag-progress-bar" style="width:0%;"></div>
+            </div>
+        </div>
+
+        <!-- Results grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Left: test groups -->
+            <div>
+                <div class="glass" style="padding:20px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-connection" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#00f2ff;">🔌 الاتصال والمصادقة</h3>
+                    </div>
+                    <div id="tests-connection"></div>
+                </div>
+
+                <div class="glass" style="padding:20px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-data" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#a855f7;">🗄️ قاعدة البيانات</h3>
+                    </div>
+                    <div id="tests-data"></div>
+                </div>
+
+                <div class="glass" style="padding:20px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-functions" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#f59e0b;">⚙️ الوظائف</h3>
+                    </div>
+                    <div id="tests-functions"></div>
+                </div>
+            </div>
+
+            <!-- Right: test groups -->
+            <div>
+                <div class="glass" style="padding:20px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-stats" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#22c55e;">📊 الإحصائيات</h3>
+                    </div>
+                    <div id="tests-stats"></div>
+                </div>
+
+                <div class="glass" style="padding:20px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-integrity" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#ef4444;">🛡️ سلامة البيانات</h3>
+                    </div>
+                    <div id="tests-integrity"></div>
+                </div>
+
+                <div class="glass" style="padding:20px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div class="pulse-dot" id="dot-content" style="background:#555;"></div>
+                        <h3 style="font-size:13px;font-weight:900;color:#06b6d4;">📝 المحتوى</h3>
+                    </div>
+                    <div id="tests-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw log -->
+        <div class="glass" style="padding:20px;margin-top:16px;">
+            <div class="flex items-center justify-between mb-3">
+                <h3 style="font-size:13px;font-weight:900;">📋 سجل التشخيص</h3>
+                <button class="btn-sm" onclick="copyDiagLog()" style="font-size:10px;padding:5px 10px;">
+                    <i class="fas fa-copy ml-1"></i>نسخ السجل
+                </button>
+            </div>
+            <div id="diag-log" style="
+                background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07);
+                border-radius:10px;padding:14px;
+                font-family:'Courier New',monospace;font-size:11px;
+                color:#888;line-height:1.7;max-height:220px;overflow-y:auto;
+                white-space:pre-wrap;direction:ltr;text-align:left;">
+جاهز للتشخيص — اضغط "تشغيل الفحص" للبدء</div>
+        </div>
+    </section>
+
 </main>
 
 <!-- Firebase -->
@@ -622,6 +798,7 @@ window.showSection = (name) => {
     if (name === 'words')     loadWords();
     if (name === 'announcements') loadAnnouncements();
     if (name === 'analytics') loadAnalytics();
+    if (name === 'diagnostics') { /* user triggers manually via Run button */ }
 };
 
 window.refreshAll = async () => {
@@ -632,14 +809,22 @@ window.refreshAll = async () => {
         await set(ref(db, 'adminConfig/codeCreatedAt'), Date.now());
     }
 
-    const [playerSnap, roomSnap, reportSnap, banSnap] = await Promise.all([
-        get(ref(db, 'players')),
+    // Players: Firebase rules may restrict reading entire tree — handle gracefully
+    let playerSnap = null;
+    try {
+        playerSnap = await get(ref(db, 'players'));
+        allPlayers = playerSnap.exists() ? playerSnap.val() : {};
+    } catch(e) {
+        allPlayers = {};
+        console.warn('[Admin] players read failed (check Firebase rules):', e.message);
+        // Attempt fallback: read only current user's own record to confirm DB is alive
+    }
+
+    const [roomSnap, reportSnap, banSnap] = await Promise.all([
         get(ref(db, 'rooms')),
         get(ref(db, 'reports')),
         get(ref(db, 'bans'))
     ]);
-
-    allPlayers = playerSnap.exists() ? playerSnap.val() : {};
     allReports = reportSnap.exists() ? reportSnap.val() : {};
     allBans    = banSnap.exists() ? banSnap.val() : {};
 
@@ -722,9 +907,29 @@ function loadAnalytics() {
             responsive:true }
     });
 
-    // Top players
+    // Top words (from wordLists)
+    get(ref(db,'wordLists')).then(wSnap => {
+        const container = document.getElementById('top-words-list');
+        if (!wSnap.exists()) { container.innerHTML = '<p style="color:#555;font-size:12px;text-align:center;padding:20px;">لا توجد كلمات</p>'; return; }
+        const wData = wSnap.val();
+        const wordFreq = {};
+        Object.entries(wData).forEach(([cat, words]) => {
+            const arr = Array.isArray(words) ? words : Object.keys(words);
+            arr.forEach(w => { wordFreq[w] = (wordFreq[w]||0) + 1; });
+        });
+        // Show top words sorted by category count (or just list them with category counts)
+        const topWords = Object.entries(wordFreq).sort((a,b)=>b[1]-a[1]).slice(0,15);
+        container.innerHTML = topWords.length
+            ? topWords.map(([w,c],i) => `
+                <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+                    <span style="font-size:10px;color:#555;width:20px;text-align:center;">${i+1}</span>
+                    <span style="flex:1;font-size:13px;font-weight:700;">${w}</span>
+                    <span style="font-size:11px;color:#00f2ff;font-weight:900;">${c} فئ${c>1?'ات':'ة'}</span>
+                </div>`).join('')
+            : '<p style="color:#555;font-size:12px;text-align:center;padding:20px;">لا توجد بيانات</p>';
+    });
+
     const topPlayers = Object.values(allPlayers)
-        .filter(p=>p.username)
         .sort((a,b)=>(b.rankPoints||0)-(a.rankPoints||0))
         .slice(0,20);
 
@@ -749,6 +954,7 @@ function loadReports() {
         renderReports();
     });
 }
+window.loadReports = loadReports;
 
 function renderReports() {
     const tbody = document.getElementById('reports-table');
@@ -804,6 +1010,7 @@ function loadBans() {
         renderBans();
     });
 }
+window.loadBans = loadBans;
 
 function renderBans() {
     const tbody = document.getElementById('bans-table');
@@ -824,7 +1031,7 @@ window.banPlayer = async () => {
     const username = document.getElementById('ban-username').value.trim();
     const reason   = document.getElementById('ban-reason').value.trim();
     const duration = parseInt(document.getElementById('ban-duration').value);
-    if (!username) { alert('الرجاء إدخال اسم المستخدم'); return; }
+    if (!username) { await UIAlert('الرجاء إدخال اسم المستخدم', { title: 'حقل مطلوب', type: 'warning', icon: '✏️' }); return; }
 
     // Find player UID
     const snap = await get(ref(db,'players'));
@@ -835,7 +1042,7 @@ window.banPlayer = async () => {
         if (players[uid].username === username) { targetUid = uid; break; }
     }
 
-    if (!targetUid) { alert('المستخدم غير موجود'); return; }
+    if (!targetUid) { await UIAlert('لا يوجد لاعب بهذا الاسم في قاعدة البيانات', { title: 'المستخدم غير موجود', type: 'error', icon: '🔍' }); return; }
 
     await set(ref(db, `bans/${targetUid}`), {
         username,
@@ -846,14 +1053,15 @@ window.banPlayer = async () => {
         bannedByName: 'Admin'
     });
 
-    alert(`تم حظر ${username}`);
+    await UIAlert(`تم حظر ${username} بنجاح`, { title: '🚫 تم الحظر', type: 'success', icon: '✅' });
     document.getElementById('ban-username').value = '';
     document.getElementById('ban-reason').value = '';
     loadBans();
 };
 
 window.unban = async (uid) => {
-    if (!confirm('هل أنت متأكد من رفع الحظر؟')) return;
+    const ok = await UIConfirm('هل أنت متأكد من رفع الحظر عن هذا اللاعب؟', { title: 'رفع الحظر', type: 'warning', confirmText: 'رفع الحظر', icon: '✅' });
+    if (!ok) return;
     await remove(ref(db, `bans/${uid}`));
     loadBans();
 };
@@ -864,6 +1072,7 @@ function loadPlayers() {
     filteredPlayers = Object.values(allPlayers).filter(p => p.username);
     renderPlayersTable(filteredPlayers);
 }
+window.loadPlayers = loadPlayers;
 
 window.searchPlayers = (q) => {
     const results = filteredPlayers.filter(p => p.username?.toLowerCase().includes(q.toLowerCase()));
@@ -901,11 +1110,21 @@ function renderPlayersTable(players) {
 window.viewPlayer = (username) => {
     const p = Object.values(allPlayers).find(pl => pl.username === username);
     if (!p) return;
-    alert(JSON.stringify({
-        username: p.username, rank: p.rank, points: p.rankPoints,
-        totalGames: p.stats?.totalGames, spyWins: p.stats?.spyWins,
-        innocentWins: p.stats?.innocentWins, coins: p.coins
-    }, null, 2));
+    const total = p.stats?.totalGames || 0;
+    const wins  = (p.stats?.spyWins||0) + (p.stats?.innocentWins||0);
+    const wr    = total ? Math.round(wins/total*100) : 0;
+    UIAlert(
+        `<div style="text-align:right;direction:rtl;line-height:2;font-size:13px;">
+            <b>الرتبة:</b> ${p.rank || 'Bronze'}<br>
+            <b>النقاط:</b> ${p.rankPoints || 0}<br>
+            <b>المباريات:</b> ${total}<br>
+            <b>انتصارات جاسوس:</b> ${p.stats?.spyWins || 0}<br>
+            <b>انتصارات بريء:</b> ${p.stats?.innocentWins || 0}<br>
+            <b>نسبة الفوز:</b> ${wr}%<br>
+            <b>العملات:</b> 🪙 ${p.coins || 0}
+        </div>`,
+        { title: `👤 ${username}`, type: 'info', icon: '' }
+    );
 };
 
 // ── WORD MANAGEMENT ──────────────────────
@@ -914,6 +1133,7 @@ async function loadWords() {
     wordListData = snap.exists() ? snap.val() : {};
     renderCategoryList();
 }
+window.loadWords = loadWords;
 
 function renderCategoryList() {
     const list = document.getElementById('category-list');
@@ -942,7 +1162,7 @@ window.selectCategory = (cat) => {
 
 window.addWord = async () => {
     const word = document.getElementById('new-word').value.trim();
-    if (!word || !activeCategory) { alert('اختر فئة وأدخل كلمة'); return; }
+    if (!word || !activeCategory) { await UIAlert('اختر فئة أولاً وأدخل كلمة', { title: 'تنبيه', type: 'warning', icon: '⚠️' }); return; }
     const words = Array.isArray(wordListData[activeCategory]) ? [...wordListData[activeCategory]] : Object.keys(wordListData[activeCategory]);
     if (!words.includes(word)) {
         words.push(word);
@@ -950,11 +1170,12 @@ window.addWord = async () => {
         await set(ref(db, `wordLists/${activeCategory}`), words);
         document.getElementById('new-word').value = '';
         selectCategory(activeCategory);
-    } else { alert('هذه الكلمة موجودة بالفعل'); }
+    } else { await UIAlert(`الكلمة "${word}" موجودة بالفعل في هذه الفئة`, { title: 'كلمة مكررة', type: 'warning', icon: '⚠️' }); }
 };
 
 window.deleteWord = async (cat, word) => {
-    if (!confirm(`حذف "${word}"؟`)) return;
+    const ok = await UIConfirm(`هل تريد حذف الكلمة "${word}" من الفئة "${cat}"؟`, { title: 'حذف كلمة', type: 'error', confirmText: 'حذف', cancelText: 'إلغاء', icon: '🗑️' });
+    if (!ok) return;
     const words = Array.isArray(wordListData[cat]) ? [...wordListData[cat]] : Object.keys(wordListData[cat]);
     const updated = words.filter(w => w !== word);
     wordListData[cat] = updated;
@@ -965,7 +1186,7 @@ window.deleteWord = async (cat, word) => {
 window.addCategory = async () => {
     const cat = document.getElementById('new-category').value.trim();
     if (!cat) return;
-    if (wordListData[cat]) { alert('هذه الفئة موجودة'); return; }
+    if (wordListData[cat]) { await UIAlert(`الفئة "${cat}" موجودة بالفعل`, { title: 'فئة مكررة', type: 'warning', icon: '⚠️' }); return; }
     wordListData[cat] = [];
     await set(ref(db, `wordLists/${cat}`), []);
     document.getElementById('new-category').value = '';
@@ -982,7 +1203,7 @@ window.setPriority = (p, btn) => {
 
 window.sendAnnouncement = async () => {
     const text = document.getElementById('ann-text').value.trim();
-    if (!text) { alert('الرجاء كتابة نص الإعلان'); return; }
+    if (!text) { await UIAlert('الرجاء كتابة نص الإعلان أولاً', { title: 'النص مطلوب', type: 'warning', icon: '✏️' }); return; }
     const duration = parseInt(document.getElementById('ann-duration').value);
 
     await push(ref(db, 'announcements'), {
@@ -993,7 +1214,7 @@ window.sendAnnouncement = async () => {
     });
 
     document.getElementById('ann-text').value = '';
-    alert('تم إرسال الإعلان');
+    await UIAlert('تم إرسال الإعلان لجميع اللاعبين بنجاح', { title: '📣 إعلان مُرسل', type: 'success', icon: '✅' });
     loadAnnouncements();
 };
 
@@ -1019,6 +1240,7 @@ function loadAnnouncements() {
             </div>`).join('');
     });
 }
+window.loadAnnouncements = loadAnnouncements;
 
 window.deleteAnn = async (id) => {
     await remove(ref(db, `announcements/${id}`));
@@ -1029,34 +1251,32 @@ window.deleteAnn = async (id) => {
 window.copyAdminCode = function() {
     const code = document.getElementById('current-admin-code').textContent;
     navigator.clipboard.writeText(code).then(() => {
-        alert('✅ تم نسخ الرمز: ' + code);
+        UIAlert(`تم نسخ الرمز: <span style="font-family:'Orbitron',sans-serif;font-size:18px;color:#00f2ff;letter-spacing:3px;">${code}</span>`, { title: 'تم النسخ', type: 'success', icon: '📋' });
     });
 };
 
 window.generateNewCode = async function() {
-    if (!confirm('⚠️ هل أنت متأكد؟\n\nإنشاء رمز جديد سيُبطل الرمز الحالي. ' +
-        'جميع من يملكون الرمز القديم لن يتمكنوا من استخدامه للوصول.')) return;
+    const ok = await UIConfirm(
+        'إنشاء رمز جديد سيُبطل الرمز الحالي.<br>جميع من يملكون الرمز القديم لن يتمكنوا من استخدامه.',
+        { title: '⚠️ تأكيد الإنشاء', type: 'warning', confirmText: 'إنشاء رمز جديد', cancelText: 'إلغاء', icon: '🔑' }
+    );
+    if (!ok) return;
 
-    // Generate random code
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let newCode = 'ADMIN';
-    for (let i = 0; i < 6; i++) {
-        newCode += chars[Math.floor(Math.random() * chars.length)];
-    }
+    for (let i = 0; i < 6; i++) { newCode += chars[Math.floor(Math.random() * chars.length)]; }
 
     try {
-        // Save to Firebase (in a protected admin-only path)
         await set(ref(db, 'adminConfig/accessCode'), newCode);
         await set(ref(db, 'adminConfig/codeCreatedAt'), Date.now());
         await set(ref(db, 'adminConfig/codeCreatedBy'), auth.currentUser.uid);
-
-        // Update display
         document.getElementById('current-admin-code').textContent = newCode;
-        
-        alert('✅ تم إنشاء رمز جديد بنجاح!\n\nالرمز الجديد: ' + newCode + 
-            '\n\nلا تنسَ حفظه في مكان آمن.');
+        await UIAlert(
+            `الرمز الجديد: <span style="font-family:'Orbitron',sans-serif;font-size:22px;color:#00f2ff;letter-spacing:4px;">${newCode}</span><br><span style="font-size:11px;color:#888;">احتفظ بهذا الرمز في مكان آمن</span>`,
+            { title: '✅ تم الإنشاء', type: 'success', icon: '' }
+        );
     } catch (e) {
-        alert('❌ خطأ في إنشاء الرمز: ' + e.message);
+        await UIAlert('خطأ في إنشاء الرمز: ' + e.message, { title: 'خطأ', type: 'error', icon: '❌' });
     }
 };
 
@@ -1113,19 +1333,523 @@ window.loadAdminsList = async function() {
 };
 
 window.revokeAdmin = async function(uid, username) {
-    if (!confirm(`هل تريد إلغاء صلاحيات الإدارة من "${username}"؟\n\nلن يتمكن من الوصول لهذه اللوحة بعد الآن.`)) return;
+    const ok = await UIConfirm(
+        `لن يتمكن <b>${username}</b> من الوصول لهذه اللوحة بعد الآن.`,
+        { title: 'إلغاء صلاحيات الإدارة', type: 'error', confirmText: 'إلغاء الصلاحيات', cancelText: 'تراجع', icon: '👤' }
+    );
+    if (!ok) return;
 
     try {
         await set(ref(db, `players/${uid}/isAdmin`), false);
         await set(ref(db, `players/${uid}/adminRevokedAt`), Date.now());
-        alert('✅ تم إلغاء الصلاحيات بنجاح');
+        await UIAlert('تم إلغاء الصلاحيات بنجاح', { title: '✅ تم', type: 'success', icon: '' });
         loadAdminsList();
     } catch (e) {
-        alert('❌ خطأ: ' + e.message);
+        await UIAlert('خطأ: ' + e.message, { title: 'خطأ', type: 'error', icon: '❌' });
     }
 };
 
-// Load admins list when admin access section is shown
+// ═══════════════════════════════════════════════
+// DIAGNOSTICS ENGINE
+// ═══════════════════════════════════════════════
+
+let diagLog = '';
+let diagCounts = { major: 0, error: 0, warning: 0, pass: 0 };
+let diagRunning = false;
+
+// Helper to emit a test result into a container
+function diagResult(containerId, severity, name, detail) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const icons = { major:'🔴', error:'🟠', warning:'🟡', pass:'🟢', info:'🔵', running:'⏳' };
+    const classes = { major:'test-major', error:'test-error', warning:'test-warning', pass:'test-pass', info:'test-info', running:'test-running' };
+    const item = document.createElement('div');
+    item.className = `test-item ${classes[severity] || 'test-info'}`;
+    item.innerHTML = `
+        <span class="test-icon">${icons[severity] || 'ℹ️'}</span>
+        <div>
+            <div class="test-name">${name}</div>
+            ${detail ? `<div class="test-detail">${detail}</div>` : ''}
+        </div>`;
+    container.appendChild(item);
+
+    // Count
+    if (['major','error','warning','pass'].includes(severity)) diagCounts[severity]++;
+
+    // Log
+    const ts = new Date().toISOString().slice(11,19);
+    const sev = severity.toUpperCase().padEnd(7);
+    diagLog += `[${ts}] ${sev} | ${name}${detail ? ' — ' + detail.replace(/<[^>]+>/g,'') : ''}\n`;
+    document.getElementById('diag-log').textContent = diagLog;
+    document.getElementById('diag-log').scrollTop = document.getElementById('diag-log').scrollHeight;
+}
+
+function diagSetDot(id, color) {
+    const el = document.getElementById(id);
+    if (el) el.style.background = color;
+}
+
+function diagUpdateCounters() {
+    document.getElementById('cnt-major').textContent   = diagCounts.major;
+    document.getElementById('cnt-error').textContent   = diagCounts.error;
+    document.getElementById('cnt-warning').textContent = diagCounts.warning;
+    document.getElementById('cnt-pass').textContent    = diagCounts.pass;
+    const summary = document.getElementById('diag-summary');
+    summary.style.setProperty('display', 'flex', 'important');
+
+    // Badge in sidebar
+    const hasIssues = diagCounts.major + diagCounts.error + diagCounts.warning > 0;
+    const badge = document.getElementById('diag-badge');
+    if (badge) badge.style.display = hasIssues ? 'inline-block' : 'none';
+}
+
+function diagProgress(current, total, label) {
+    const pct = Math.round(current / total * 100);
+    document.getElementById('diag-progress-bar').style.width = pct + '%';
+    document.getElementById('diag-progress-pct').textContent = pct + '%';
+    if (label) document.getElementById('diag-progress-label').textContent = label;
+}
+
+window.clearDiagnostics = function() {
+    ['tests-connection','tests-data','tests-stats','tests-integrity','tests-functions','tests-content']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+    ['dot-connection','dot-data','dot-functions','dot-stats','dot-integrity','dot-content']
+        .forEach(id => diagSetDot(id, '#555'));
+    document.getElementById('diag-log').textContent = 'جاهز للتشخيص — اضغط "تشغيل الفحص" للبدء';
+    document.getElementById('diag-summary').style.setProperty('display', 'none', 'important');
+    document.getElementById('diag-progress-wrap').style.display = 'none';
+    diagLog = ''; diagCounts = { major:0, error:0, warning:0, pass:0 };
+};
+
+window.copyDiagLog = function() {
+    navigator.clipboard.writeText(diagLog).then(() =>
+        UIAlert('تم نسخ سجل التشخيص', { title: 'تم النسخ', type: 'success', icon: '📋' })
+    );
+};
+
+window.runDiagnostics = async function() {
+    if (diagRunning) return;
+    diagRunning = true;
+    clearDiagnostics();
+    const btn = document.getElementById('run-tests-btn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري الفحص...';
+    btn.disabled = true;
+
+    document.getElementById('diag-progress-wrap').style.display = 'block';
+    document.getElementById('diag-last-run').textContent =
+        'آخر فحص: ' + new Date().toLocaleString('ar-SA');
+    diagLog = `=== EL JASUS DIAGNOSTICS RUN ===\n${new Date().toISOString()}\n\n`;
+
+    const TOTAL = 30;
+    let step = 0;
+    const step_ = (lbl) => { step++; diagProgress(step, TOTAL, lbl); };
+    const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
+    // ─── GROUP 1: CONNECTION & AUTH ─────────────────────
+    diagSetDot('dot-connection', '#fbbf24');
+    step_('فحص الاتصال بـ Firebase...');
+    await delay(100);
+
+    // Test 1: Firebase app init
+    try {
+        const testSnap = await get(ref(db, 'adminConfig'));
+        if (testSnap.exists()) {
+            diagResult('tests-connection', 'pass', 'اتصال Firebase', 'القراءة من قاعدة البيانات تعمل بشكل صحيح ✅');
+        } else {
+            diagResult('tests-connection', 'warning', 'اتصال Firebase — adminConfig فارغ', 'متصل، لكن لا توجد بيانات في adminConfig بعد');
+        }
+    } catch(e) {
+        if (e.message && e.message.includes('Permission')) {
+            diagResult('tests-connection', 'warning', 'اتصال Firebase (مقيّد)', 'الاتصال يعمل لكن adminConfig مرفوض — تحقق من قواعد Firebase');
+        } else {
+            diagResult('tests-connection', 'major', 'فشل الاتصال بـ Firebase', e.message);
+        }
+    }
+
+    step_('التحقق من حالة المصادقة...');
+    await delay(80);
+
+    // Test 2: Auth
+    const user = auth.currentUser;
+    if (user) {
+        diagResult('tests-connection', 'pass', 'المصادقة', `مسجّل الدخول: ${user.email || user.uid}`);
+    } else {
+        diagResult('tests-connection', 'major', 'غير مسجل الدخول', 'لم يتم التعرف على أي مستخدم — التوجيه لـ login.html');
+    }
+
+    step_('التحقق من صلاحيات الإدارة...');
+    await delay(80);
+
+    // Test 3: Admin status
+    if (user) {
+        try {
+            const adminSnap = await get(ref(db, `players/${user.uid}/isAdmin`));
+            if (adminSnap.val() === true) {
+                diagResult('tests-connection', 'pass', 'صلاحيات الإدارة', 'المستخدم الحالي لديه صلاحيات admin');
+            } else {
+                diagResult('tests-connection', 'major', 'لا صلاحيات إدارة', `players/${user.uid}/isAdmin ليس true`);
+            }
+        } catch(e) {
+            diagResult('tests-connection', 'error', 'خطأ في قراءة صلاحيات', e.message);
+        }
+    }
+
+    // Test 4: Admin code
+    step_('التحقق من رمز الإدارة...');
+    await delay(80);
+    try {
+        const codeSnap = await get(ref(db, 'adminConfig/accessCode'));
+        if (codeSnap.exists()) {
+            diagResult('tests-connection', 'pass', 'رمز الإدارة موجود', `الرمز محفوظ في Firebase: ${codeSnap.val()}`);
+        } else {
+            diagResult('tests-connection', 'warning', 'رمز الإدارة غير موجود في Firebase', 'سيُستخدم الرمز الافتراضي ADMIN26');
+        }
+    } catch(e) {
+        diagResult('tests-connection', 'error', 'خطأ في قراءة رمز الإدارة', e.message);
+    }
+
+    diagSetDot('dot-connection', diagCounts.major > 0 ? '#ef4444' : '#22c55e');
+
+    // ─── GROUP 2: DATABASE READ ─────────────────────────
+    diagSetDot('dot-data', '#fbbf24');
+    const dbNodes = [
+        { path: 'rooms',         label: 'قاعدة الغرف',        severity: 'error',   container: 'tests-data' },
+        { path: 'reports',       label: 'البلاغات',           severity: 'warning', container: 'tests-data' },
+        { path: 'bans',          label: 'الحظورات',           severity: 'warning', container: 'tests-data' },
+        { path: 'wordLists',     label: 'قوائم الكلمات',      severity: 'warning', container: 'tests-data' },
+        { path: 'announcements', label: 'الإعلانات',          severity: 'warning', container: 'tests-data' },
+    ];
+
+    // Players: test separately with special handling for permission rules
+    step_('قراءة بيانات اللاعبين...');
+    await delay(80);
+    try {
+        const pSnap = await get(ref(db, 'players'));
+        const count = pSnap.exists() ? Object.keys(pSnap.val()).length : 0;
+        if (count > 0) {
+            allPlayers = pSnap.val();
+            diagResult('tests-data', 'pass', 'قراءة players', `${count} لاعب — ✅ يعمل`);
+        } else {
+            diagResult('tests-data', 'info', 'قراءة players', 'العقدة فارغة (لا يوجد لاعبون بعد)');
+        }
+    } catch(e) {
+        if (e.message && (e.message.includes('Permission') || e.message.includes('permission'))) {
+            diagResult('tests-data', 'error', 'players — رُفض الوصول (Firebase Rules)',
+                `قواعد Firebase تمنع قراءة كل اللاعبين. أضف هذه القاعدة في Firebase Console:<br>
+                <code style="font-family:monospace;font-size:10px;background:rgba(0,0,0,.4);padding:4px 8px;border-radius:4px;display:inline-block;margin-top:4px;direction:ltr;">
+                "players": { ".read": "auth != null && root.child('players').child(auth.uid).child('isAdmin').val() === true" }
+                </code>`);
+        } else {
+            diagResult('tests-data', 'major', 'خطأ في قراءة players', e.message);
+        }
+    }
+    for (const node of dbNodes) {
+        step_(`قراءة ${node.label}...`);
+        await delay(80);
+        try {
+            const snap = await get(ref(db, node.path));
+            const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+            diagResult(node.container, count > 0 ? 'pass' : 'info',
+                `قراءة ${node.path}`,
+                snap.exists() ? `${count} سجل — ✅ يعمل` : 'العقدة فارغة (لا توجد سجلات بعد)');
+        } catch(e) {
+            diagResult(node.container, node.severity, `خطأ في قراءة ${node.path}`, e.message);
+        }
+    }
+    diagSetDot('dot-data', '#22c55e');
+
+    // ─── GROUP 3: STATS FUNCTIONS ───────────────────────
+    diagSetDot('dot-stats', '#fbbf24');
+    step_('فحص وظائف الإحصائيات...');
+    await delay(100);
+
+    // Re-read players fresh for stats (allPlayers may be empty due to rules)
+    let statsPlayers = Object.values(allPlayers);
+    if (statsPlayers.length === 0) {
+        // Try one more time inline
+        try {
+            const ps = await get(ref(db, 'players'));
+            if (ps.exists()) {
+                allPlayers = ps.val();
+                statsPlayers = Object.values(allPlayers);
+            }
+        } catch(e) { /* already logged in data section */ }
+    }
+    const players = statsPlayers;
+
+    // Player count
+    if (players.length === 0) {
+        diagResult('tests-stats', 'warning', 'لا يوجد لاعبون في الذاكرة',
+            'إما أن قاعدة البيانات فارغة، أو Firebase Rules تمنع قراءة players (راجع نتائج فحص قاعدة البيانات أعلاه)');
+    } else {
+        diagResult('tests-stats', 'pass', 'بيانات اللاعبين محمّلة', `${players.length} لاعب في الذاكرة`);
+    }
+
+    step_('فحص إحصائيات اللاعبين...');
+    await delay(80);
+
+    // Player field integrity
+    const withUsername = players.filter(p => p.username).length;
+    const withRank     = players.filter(p => p.rank).length;
+    const withStats    = players.filter(p => p.stats).length;
+    const withPoints   = players.filter(p => typeof p.rankPoints === 'number').length;
+    const missing      = [];
+    if (withUsername < players.length) missing.push(`${players.length - withUsername} بلا username`);
+    if (withRank     < players.length) missing.push(`${players.length - withRank} بلا rank`);
+    if (withStats    < players.length) missing.push(`${players.length - withStats} بلا stats`);
+    if (withPoints   < players.length) missing.push(`${players.length - withPoints} بلا rankPoints`);
+
+    if (missing.length) {
+        diagResult('tests-stats', 'warning', 'حقول مفقودة في بعض اللاعبين', missing.join(' | '));
+    } else {
+        diagResult('tests-stats', 'pass', 'حقول اللاعبين مكتملة', 'username ✓ rank ✓ stats ✓ rankPoints ✓');
+    }
+
+    step_('فحص حسابات الفوز...');
+    await delay(80);
+
+    // Check win rate calculation
+    let wr_ok = 0, wr_bad = 0;
+    players.forEach(p => {
+        const total = p.stats?.totalGames || 0;
+        const wins  = (p.stats?.spyWins||0) + (p.stats?.innocentWins||0);
+        if (total > 0 && wins > total) wr_bad++;
+        else wr_ok++;
+    });
+    if (wr_bad > 0) {
+        diagResult('tests-stats', 'error', 'بيانات فوز غير منطقية', `${wr_bad} لاعب لديه انتصارات > مباريات`);
+    } else {
+        diagResult('tests-stats', 'pass', 'حسابات الفوز سليمة', `${wr_ok} لاعب — لا تناقضات`);
+    }
+
+    step_('فحص توزيع الرتب...');
+    await delay(80);
+
+    // Rank distribution
+    const validRanks = ['Bronze','Silver','Gold','Platinum','Diamond'];
+    const invalidRankPlayers = players.filter(p => p.rank && !validRanks.includes(p.rank));
+    if (invalidRankPlayers.length) {
+        diagResult('tests-stats', 'warning', 'رتب غير معروفة',
+            invalidRankPlayers.map(p => `${p.username}: ${p.rank}`).join(', '));
+    } else {
+        diagResult('tests-stats', 'pass', 'قيم الرتب صحيحة', validRanks.join(' | '));
+    }
+
+    diagSetDot('dot-stats', '#22c55e');
+
+    // ─── GROUP 4: DATA INTEGRITY ───────────────────────
+    diagSetDot('dot-integrity', '#fbbf24');
+    step_('فحص سلامة البيانات...');
+    await delay(100);
+
+    // Active bans — check expired
+    try {
+        const bansSnap = await get(ref(db, 'bans'));
+        if (bansSnap.exists()) {
+            const bans = Object.entries(bansSnap.val());
+            const expired = bans.filter(([,b]) => !b.permanent && b.expiresAt && b.expiresAt < Date.now());
+            if (expired.length) {
+                diagResult('tests-integrity', 'warning', 'حظورات منتهية الصلاحية',
+                    `${expired.length} حظر منتهٍ لم يُنظَّف — يمكن مسحها يدوياً`);
+            } else {
+                diagResult('tests-integrity', 'pass', 'الحظورات نظيفة', `${bans.length} حظر نشط، لا منتهية`);
+            }
+        } else {
+            diagResult('tests-integrity', 'info', 'لا توجد حظورات', 'جدول bans فارغ');
+        }
+    } catch(e) {
+        diagResult('tests-integrity', 'error', 'خطأ في فحص الحظورات', e.message);
+    }
+
+    step_('فحص البلاغات المعلقة...');
+    await delay(80);
+
+    // Pending reports
+    const pendingReports = Object.values(allReports).filter(r => r.status === 'pending').length;
+    if (pendingReports > 10) {
+        diagResult('tests-integrity', 'warning', 'بلاغات معلقة كثيرة', `${pendingReports} بلاغ لم يُعالج`);
+    } else if (pendingReports > 0) {
+        diagResult('tests-integrity', 'info', `${pendingReports} بلاغ معلق`, 'تحقق من قسم البلاغات');
+    } else {
+        diagResult('tests-integrity', 'pass', 'لا بلاغات معلقة', 'جميع البلاغات معالجة');
+    }
+
+    step_('فحص غرف اللعب...');
+    await delay(80);
+
+    // Stale rooms
+    try {
+        const roomsSnap = await get(ref(db, 'rooms'));
+        if (roomsSnap.exists()) {
+            const rooms = Object.values(roomsSnap.val());
+            const stale = rooms.filter(r => r.status === 'playing' && (!r.players || Object.keys(r.players||{}).length < 2));
+            const active = rooms.filter(r => r.status === 'waiting' || r.status === 'playing');
+            if (stale.length) {
+                diagResult('tests-integrity', 'warning', 'غرف علقت في حالة playing', `${stale.length} غرفة بلاعبين أقل من 2`);
+            } else {
+                diagResult('tests-integrity', 'pass', 'الغرف سليمة', `${active.length} غرفة نشطة`);
+            }
+        } else {
+            diagResult('tests-integrity', 'info', 'لا توجد غرف', 'جدول rooms فارغ');
+        }
+    } catch(e) {
+        diagResult('tests-integrity', 'warning', 'تعذّر فحص الغرف', e.message);
+    }
+
+    step_('فحص مدونة قواعد السلوك...');
+    await delay(80);
+
+    // Moderation — check blocked words available
+    if (typeof window.MOD !== 'undefined') {
+        diagResult('tests-integrity', 'pass', 'نظام الإشراف محمّل', 'MOD.checkAndHandleMessage متاح');
+    } else {
+        diagResult('tests-integrity', 'info', 'moderation.js غير نشط في هذه الصفحة',
+            'هذا طبيعي — الإشراف يعمل في room.html و index.html حيث يلعب المستخدمون');
+    }
+
+    diagSetDot('dot-integrity', '#22c55e');
+
+    // ─── GROUP 5: FUNCTION AVAILABILITY ───────────────
+    diagSetDot('dot-functions', '#fbbf24');
+    step_('فحص توفر الوظائف...');
+    await delay(100);
+
+    const requiredFns = [
+        ['refreshAll',         'تحديث البيانات'],
+        ['showSection',        'التنقل بين الأقسام'],
+        ['banPlayer',          'حظر لاعب'],
+        ['unban',              'رفع الحظر'],
+        ['loadPlayers',        'تحميل اللاعبين'],
+        ['searchPlayers',      'البحث عن لاعب'],
+        ['viewPlayer',         'عرض بيانات لاعب'],
+        ['loadBans',           'تحميل الحظورات'],
+        ['loadReports',        'تحميل البلاغات'],
+        ['filterReports',      'تصفية البلاغات'],
+        ['resolveReport',      'حل البلاغ'],
+        ['banFromReport',      'حظر من بلاغ'],
+        ['loadWords',          'تحميل الكلمات'],
+        ['selectCategory',     'اختيار فئة'],
+        ['addWord',            'إضافة كلمة'],
+        ['deleteWord',         'حذف كلمة'],
+        ['addCategory',        'إضافة فئة'],
+        ['loadAnnouncements',  'تحميل الإعلانات'],
+        ['sendAnnouncement',   'إرسال إعلان'],
+        ['deleteAnn',          'حذف إعلان'],
+        ['setPriority',        'تحديد الأولوية'],
+        ['loadAdminsList',     'قائمة المسؤولين'],
+        ['revokeAdmin',        'إلغاء صلاحيات'],
+        ['generateNewCode',    'إنشاء رمز جديد'],
+        ['copyAdminCode',      'نسخ الرمز'],
+        ['verifyAdminCode',    'التحقق من الرمز'],
+        ['runDiagnostics',     'تشغيل التشخيص'],
+        ['clearDiagnostics',   'مسح التشخيص'],
+    ];
+
+    let fnMissing = 0;
+    for (const [fn, label] of requiredFns) {
+        if (typeof window[fn] === 'function') {
+            diagResult('tests-functions', 'pass', `${label}`, `window.${fn}() ✓`);
+        } else {
+            diagResult('tests-functions', 'error', `وظيفة مفقودة: ${fn}`, `${label} — window.${fn} غير معرّفة`);
+            fnMissing++;
+        }
+        await delay(20);
+    }
+    step_('اكتمل فحص الوظائف');
+
+    if (fnMissing === 0) {
+        diagResult('tests-functions', 'pass', 'جميع الوظائف متاحة', `${requiredFns.length}/${requiredFns.length} وظيفة تعمل`);
+    } else {
+        diagResult('tests-functions', 'error', `${fnMissing} وظيفة مفقودة`, 'تحقق من تحميل ملفات JS');
+    }
+    diagSetDot('dot-functions', fnMissing ? '#ef4444' : '#22c55e');
+
+    // ─── GROUP 6: CONTENT CHECK ────────────────────────
+    diagSetDot('dot-content', '#fbbf24');
+    step_('فحص محتوى قوائم الكلمات...');
+    await delay(100);
+
+    try {
+        const wSnap = await get(ref(db, 'wordLists'));
+        if (!wSnap.exists()) {
+            diagResult('tests-content', 'warning', 'قوائم الكلمات فارغة',
+                'لا توجد فئات في wordLists — اللعبة ستستخدم الكلمات المدمجة فقط');
+        } else {
+            const wData = wSnap.val();
+            const cats  = Object.keys(wData);
+            let emptyCats = 0, totalWords = 0;
+            cats.forEach(c => {
+                const arr = Array.isArray(wData[c]) ? wData[c] : Object.keys(wData[c]);
+                totalWords += arr.length;
+                if (arr.length === 0) emptyCats++;
+            });
+            if (emptyCats) {
+                diagResult('tests-content', 'warning', 'فئات فارغة', `${emptyCats} فئة بدون كلمات من أصل ${cats.length}`);
+            }
+            diagResult('tests-content', cats.length > 0 ? 'pass' : 'warning', 'قوائم الكلمات',
+                `${cats.length} فئة | ${totalWords} كلمة إجمالاً`);
+        }
+    } catch(e) {
+        diagResult('tests-content', 'error', 'خطأ في قراءة قوائم الكلمات', e.message);
+    }
+
+    step_('فحص الإعلانات المنتهية...');
+    await delay(80);
+
+    // Expired announcements
+    try {
+        const annSnap = await get(ref(db, 'announcements'));
+        if (annSnap.exists()) {
+            const anns = Object.entries(annSnap.val());
+            const expired = anns.filter(([,a]) => a.expiresAt < Date.now());
+            const active  = anns.length - expired.length;
+            if (expired.length > 5) {
+                diagResult('tests-content', 'warning', 'إعلانات منتهية الصلاحية',
+                    `${expired.length} إعلان منتهٍ — يمكن حذفها لتنظيف قاعدة البيانات`);
+            } else {
+                diagResult('tests-content', 'pass', 'الإعلانات',
+                    `${active} نشط | ${expired.length} منتهٍ`);
+            }
+        } else {
+            diagResult('tests-content', 'info', 'لا توجد إعلانات', 'جدول announcements فارغ');
+        }
+    } catch(e) {
+        diagResult('tests-content', 'warning', 'خطأ في فحص الإعلانات', e.message);
+    }
+
+    // Chart.js availability
+    step_('فحص مكتبات الرسوم البيانية...');
+    await delay(80);
+    if (typeof Chart !== 'undefined') {
+        diagResult('tests-content', 'pass', 'Chart.js متاح', `الإصدار: ${Chart.version || 'غير معروف'}`);
+    } else {
+        diagResult('tests-content', 'error', 'Chart.js غير محمّل', 'الرسوم البيانية في قسم التحليلات لن تعمل');
+    }
+
+    diagSetDot('dot-content', '#22c55e');
+
+    // ─── DONE ──────────────────────────────────────────
+    diagProgress(TOTAL, TOTAL, 'اكتمل الفحص');
+    diagUpdateCounters();
+
+    const total = diagCounts.major + diagCounts.error + diagCounts.warning + diagCounts.pass;
+    const emoji = diagCounts.major > 0 ? '🔴' : diagCounts.error > 0 ? '🟠' : diagCounts.warning > 0 ? '🟡' : '🟢';
+    diagLog += `\n=== النتيجة: ${emoji} ${diagCounts.major} جسيم | ${diagCounts.error} خطأ | ${diagCounts.warning} تحذير | ${diagCounts.pass} ناجح ===\n`;
+    document.getElementById('diag-log').textContent = diagLog;
+
+    setTimeout(() => {
+        document.getElementById('diag-progress-wrap').style.display = 'none';
+    }, 1500);
+
+    btn.innerHTML = '<i class="fas fa-check ml-2"></i>اكتمل الفحص';
+    btn.disabled = false;
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-play ml-2"></i>إعادة الفحص';
+    }, 2000);
+    diagRunning = false;
+};
+
+// ═══════════════════════════════════════════════
 const _origShowSection = window.showSection;
 window.showSection = function(name) {
     _origShowSection(name);

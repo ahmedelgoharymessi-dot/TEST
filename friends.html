@@ -658,16 +658,12 @@ const firebaseConfig = {
     <link rel="stylesheet" href="mobile.css">
     <script src="sound-system.js" defer></script>
     <script src="qr-notifications.js" defer></script>
+    <script src="dialogs.js"></script>
+<script>
+    window.alert   = (msg)             => UIAlert(msg);
+    window.confirm = (msg)             => UIConfirm(msg);
+    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+</script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
-    <!-- Mobile Bottom Nav -->
-    <nav id="mobile-nav">
-        <ul>
-            <li><a href="index.html"><i class="fas fa-home"></i>الرئيسية</a></li>
-            <li><a href="onlinerooms.html"><i class="fas fa-gamepad"></i>اللعب</a></li>
-            <li><a href="friends.html" class="active"><i class="fas fa-users"></i>الأصدقاء</a></li>
-            <li><a href="shop.html"><i class="fas fa-store"></i>المتجر</a></li>
-            <li><a href="account.html"><i class="fas fa-user"></i>حسابي</a></li>
-        </ul>
-    </nav>
 </body>
 </html>
