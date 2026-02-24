@@ -942,9 +942,85 @@
             <div class="logo-hex mx-auto mb-4">
                 <img src="ElJasus2.png" alt="Logo" class="w-16 h-16 rounded-full">
             </div>
-            <h1 class="text-4xl font-black uppercase tracking-tighter glitch neon-text mb-2" data-text="El Jasus" style="font-family: 'Orbitron', sans-serif;">
-                El <span class="dynamic-text-primary">Jasus</span>
-            </h1>
+           
+            <!-- DROP-IN REPLACEMENT -->
+<h1 class="text-4xl font-black uppercase tracking-tighter glitch neon-text mb-2"
+    data-text="El Jasus" style="font-family:'Orbitron',sans-serif;">
+    El <span class="dynamic-text-primary">Jasus</span>
+</h1>
+
+<div class="presented-wrap">
+    <p class="presented-by">Presented by</p>
+    <a href="https://ahmedelgoharymessi-dot.github.io/PhineX.github.io/" 
+       class="phinex-brand" target="_blank">
+        Phine<span class="phinex-x">X</span>
+    </a>
+</div>
+
+<style>
+/* ── Wrapper ──────────────────────────────── */
+.presented-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* ── "Presented by" label ─────────────────── */
+.presented-by {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: rgb(255, 255, 255);
+    font-family: 'Cairo', sans-serif;
+    /* subtle separator line on the left */
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,.12);
+    line-height: 1;
+    margin: 0;
+}
+
+.phinex-brand:hover{
+    text-shadow: #4e00d4;
+    box-shadow:#4e00d4;
+    color: #4e00d4;
+}
+
+/* ── PhineX brand ─────────────────────────── */
+.phinex-brand {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    transition: color .25s ease;
+    line-height: 1;
+}
+
+/* The X gets the cyan accent */
+.phinex-x {
+    color: #380081;
+    text-shadow:
+        0 0 8px rgb(76, 0, 255),
+        0 0 20px rgb(52, 0, 89);
+    font-style: italic;
+    transition: text-shadow .25s ease;
+}
+
+/* Hover — whole word lights up slightly */
+.phinex-brand:hover {
+    color: #fff;
+}
+.phinex-brand:hover .phinex-x {
+    text-shadow:
+        0 0 12px rgba(0,242,255,1),
+        0 0 30px rgba(0,242,255,.6),
+        0 0 60px rgba(124,48,255,.4);
+}
+</style>
             <div class="flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold">
                 <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>ONLINE</span>
@@ -1520,18 +1596,46 @@ const firebaseConfig = {
         };
     </script>
 
-    <!-- Mobile Bottom Navigation -->
-    <nav id="mobile-nav">
-        <ul>
-            <li><a href="index.html" class="active"><i class="fas fa-home"></i>الرئيسية</a></li>
-            <li><a href="onlinerooms.html"><i class="fas fa-gamepad"></i>اللعب</a></li>
-            <li><a href="friends.html"><i class="fas fa-users"></i>الأصدقاء</a></li>
-            <li><a href="shop.html"><i class="fas fa-store"></i>المتجر</a></li>
-            <li><a href="account.html"><i class="fas fa-user"></i>حسابي</a></li>
-        </ul>
-    </nav>
 
     <link rel="stylesheet" href="mobile.css">
+<style>
+/* ─────────────────────────────────────────────────────
+   FIX 1
+───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #sideNav {
+        transform: translateX(-100%) !important;  /* ← LEFT side entry */
+        width:  100vw   !important;
+        height: 100dvh  !important;
+        transition: transform 0.38s cubic-bezier(0.4,0,0.2,1) !important;
+    }
+
+    /* Correct open state ── JS adds .mobile-open, not .open */
+    #sideNav.mobile-open {
+        transform: translateX(0) !important;
+    }
+
+    /* Neutralise the wrong .open rule mobile.css left behind */
+    #sideNav.open {
+        transform: translateX(-100%) !important;
+    }
+}
+
+@media (min-width: 769px) {
+    /* Desktop: width-based slide, no transform at all */
+    #sideNav {
+        transform: none !important;
+        height: 100vh   !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────
+   FIX 2
+───────────────────────────────────────────────────── */
+#sidebar-overlay {
+    display: none !important;
+}
+</style>
     <script src="sound-system.js" defer></script>
     <script src="qr-notifications.js" defer></script>
 

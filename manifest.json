@@ -2,30 +2,55 @@
   "name": "El Jasus — الجاسوس",
   "short_name": "الجاسوس",
   "description": "لعبة الجاسوس الاجتماعية متعددة اللاعبين",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0e1a",
   "theme_color": "#00f2ff",
   "lang": "ar",
   "dir": "rtl",
-  "categories": ["games", "entertainment", "social"],
+  "categories": ["games", "entertainment", "social", "fun" , "PhineX"],
   "icons": [
-    { "src": "ElJasus2.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "ElJasus2.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "./ElJasus2.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./ElJasus2.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
     {
       "name": "العب الآن",
       "short_name": "العب",
-      "url": "/onlinerooms.html",
-      "icons": [{ "src": "ElJasus2.png", "sizes": "96x96" }]
+      "url": "./onlinerooms.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96" }]
     },
     {
       "name": "المتجر",
       "short_name": "متجر",
-      "url": "/shop.html",
-      "icons": [{ "src": "ElJasus2.png", "sizes": "96x96" }]
+      "url": "./shop.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "سجل دخولك",
+      "short_name": "سجل دخولك",
+      "url": "./login.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "شوف ترتيبك",
+      "short_name": "شوف ترتيبك",
+      "url": "./leaderboard.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "تحقق من معايير المجتمع",
+      "short_name": "معايير المجتمع",
+      "url": "./community.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "العب مع صحابك",
+      "short_name": "العب مع صحابك",
+      "url": "./friends.html",
+      "icons": [{ "src": "./ElJasus2.png", "sizes": "96x96"}]
     }
   ],
   "screenshots": [],

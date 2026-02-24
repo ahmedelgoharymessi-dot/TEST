@@ -427,7 +427,7 @@
             background: linear-gradient(45deg, 
                 #6600ff, #9900ff, #0066ff, #0033ff, 
                 #3300ff, #6600ff, #9900ff, #cc00ff,
-                #006b81);
+                #00d4ff);
             position: absolute;
             top: -3px;
             left: -3px;
@@ -519,7 +519,7 @@
 
                 <div class="form-group">
                     <label>كلمة المرور</label>
-                    <input type="password" id="password" placeholder="••••••••••••" required>
+                    <input type="password" id="password" placeholder="••••••••" required>
                 </div>
 
                 <label class="checkbox-container" style="margin-top:-8px;margin-bottom:8px;">
@@ -538,67 +538,7 @@
                 <label class="checkbox-container">
                     <input type="checkbox" id="forgot_password">
                     <span class="custom-checkbox"></span>
-                    <span class="checkbox-label">أوافق على </span><a href="community.html" class="community-link">شروط و معايير المجتمع<span class="link-underline"></span></a>
-
-<style>
-.checkbox-label {
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: 'Cairo', sans-serif;
-}
-
-.community-link {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
-    font-weight: 900;
-    font-family: 'Cairo', sans-serif;
-    color: #00f2ff;
-    text-decoration: none;
-    padding: 1px 6px 1px 4px;
-    border-radius: 5px;
-    background: rgba(0, 242, 255, 0.07);
-    border: 1px solid rgba(0, 242, 255, 0.25);
-    transition: all 0.25s ease;
-    white-space: nowrap;
-}
-
-/* shield icon via pseudo */
-.community-link::before {
-    content: '🛡️';
-    font-size: 11px;
-    line-height: 1;
-}
-
-/* animated underline */
-.link-underline {
-    position: absolute;
-    bottom: -1px;
-    right: 0;
-    height: 1px;
-    width: 0%;
-    background: linear-gradient(90deg, transparent, #00f2ff);
-    border-radius: 99px;
-    transition: width 0.3s ease;
-}
-
-.community-link:hover {
-    color: #fff;
-    background: rgba(0, 242, 255, 0.15);
-    border-color: rgba(0, 242, 255, 0.6);
-    box-shadow:
-        0 0 12px rgba(0, 242, 255, 0.3),
-        inset 0 0 10px rgba(0, 242, 255, 0.05);
-    text-shadow: 0 0 8px rgba(0, 242, 255, 0.8);
-}
-
-.community-link:hover .link-underline {
-    width: 100%;
-}
-</style>
+                    <span class="checkbox-label">ابقني مسجلاً</span>
                 </label>
 
                 <button type="submit" class="btn-primary" id="loginBtn">
@@ -613,6 +553,62 @@
                     <a href="#" class="social-btn google-official">
                         <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw8NDw8QEA8NEA8NDQ8QDg8QDhUQEA8QFREWFxUTFRUYISggGBsmGxUXIjEtJSkrMS46Fx8zODMuOCg5LisBCgoKDg0OGxAQGjcmICItMC0tMistLS0tLS8tLS0tLS0tLi8uKy0rLS0tLi0rLS0tLS0vLS0tLS0tKy0tLS0tLf/AABEIAOEA4QMBEQACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAAAQYCAwUHBP/EAEMQAAIBAgEHBwgIBAcBAAAAAAABAgMRBAUGEiExQVETImFxgZGhBxcyUlOSscEjQlRicrLR8BY0Q3QUJDOCosLhc//EABsBAQACAwEBAAAAAAAAAAAAAAABAwIEBQYH/8QAOBEAAgEDAAQMBQQDAAMAAAAAAAECAwQRBRIhMRVBUVJhcYGhscHR4RMiMpHwBhQzNCNC8SRicv/aAAwDAQACEQMRAD8A9xAAAAAAAAAAAAAOZlPODCYW6q1oKa/px58+2Mda7SudaEN7Ny30fcV9sI7OV7F92VnHeUFbKGHb+9Vlb/jG9+81pXnNR2aP6ee+rP7er9Dh4rPLH1NlWNNcKdOKXfK78Sl3NR8Z0aehrSH+uetvywjmVsrYqfpYnEu+7lp27r2KnUm97NyNpQjupr7I+adacvSlN9cm/iY5ZcoRW5GMZtbG11OwyS0nvRuhja0fRrVo/hqyXwZkpS5TB0KT3xX2R9lDODG0/RxVf/fPlPz3M1VmuM156PtZ76a7FjwwdXCZ84yFtNUaq36UNGT7Y2S7i2NzNbzRq6DtpfTlduV3+p3sBn7h52VanUovfJfSwXdaXgXxuYvejmVtA1o7aclLufp3llwWPo4iOlSqwqLfoyTa61tXaXxkpbmcitQqUXipFrrPpMikAAAAAAAAAAAAAAAAAAAAAAHCy5nVhsHeN+VrL+lB+i/vy2R+PQUVLiENm9nTs9FV7n5t0eV+S4/DpKJlfOvF4q60+Spv+nSbjq+9La/BdBpTuJz6D0troq3obcaz5X6bl49Jwkik6YBAAAAAABIBJIZJJAJINlGrKnJShKUJLZKMnGS6mjJPG4xnGM1qyWV0lryNnxVp2jiY8rD2kUo1V1rZLw7TZhcNfUcO70JTn81F6r5OL1XeXnJ+UKOJgp0ZxnHfbbF8JLan1m1GSkso83Xt6lCWrUWH+buU+oyKQAAAAAAAAAAAAAAAAasViYUYOdSShCO2T/etmM5xgtaTwjOnTnUkowWWyg5wZ2Va96dDSpUtjlsqTXX9VdWvp3HIrX0p7IbF3+x6ix0TTpfPV+aXcvX86ypyiURkdxM1NFqMyCQAAAAAAACUASiSCUZAIkgkkgkkH04DHVcNNVKU3CS222SXCS2NGcZOLyiitQp1o6lRZX5uPSM2856eNShK1PEJa4X5s7bXB/LaunablOqpbOM8nf6MnbfNHbHl5Ov1O+WnLAAAAAAAAAAAAAB8mUsoU8LTc6j6IxXpTfBIouLiFCGtP/pfb28689WH/DzvLOVKuMnpTdor0KafNgvm+k83Xup15Zl2Lk/OU9XaWtO3jiO/jfL+chypRIjI3UzTOJfGRamaZxLoyLEzWywyIJAAAAAABJIJJIJJBKJICJIJJIJJBMJOLTTacWmmnZprY09zJIaTWGemZm5cqYynKNWL06Nk6qVoVL/CXFdKe+xuUpuS2nj9K2ULaacHslxca9uQsRccoAAAAAAAAAAHzZQxsMNTlUqOyjsW+T3RXSVVq0aMHORbQoyrTUInnOU8o1MVUdSb6IxWyEeC/es8rcV51560uzoPWW9vChDUj29J8hQbBrnEsjIzTNE4l8ZFiZpnEuiyxM0ziXxZYmYGZkQSAAAAASSCSSCSQSSQSSQDIgkkHWzdyHUx1SyvGlBrlaltn3Y8ZPw2vpzp03NmjfX0LWGXtk9y830HqWBwdPD040qcVGEFZJeLb3s3kklhHi61adWbnN5bN5JWAAAAAAAAAROSim20kk229SSW1shtJZZKTbwjzrOHKzxdW6uqULqlHjxk+l+B5e8uncTyvpW71PV2Vorent+p7/Q5Rpm4AA0QnglGucS2MixM0TiXxZYmaZxLossTNMol8WWJmKV2krtt2SWtt9CMyXsWTrYTNnHVrOOHqJPfUtS7bSafgWxoVHxGjV0na09jmuzb4HTp5hY17ZYaPXUm34R+ZYrSfQactPWq3KT7F6mx5gYrdVwzfTKa/wCpP7SfKjFaft+OMu71PnrZkY6C1KjU6IVdf/NIh21RFsdOWkt7a616ZORjclYnD/6tCrBLbJxvD3lq8SuUJR3o3qN1RrfxzT8ftvPjMTYJMjEkkBEkHWzfyHUx1TRjeNODXK1LaorguMmWU6bmzSvr2FrDL2t7l+cR6lgcHTw9ONKlFRhBalx4tve2b0YqKwjxdatOtNzm8tn0ElQAAAAAAAAAAKvnjlKyWHg9ckpVWt0d0e3a+zicTS11hfBjx7+rk7fDrOzou2y/jS4t3r+eRUHE4WTu5MXEyyTkixJJAAaCZkmapxLYyM0zUqTk1GKcpSdoxirtvgktpsQeXhGeuorLeEWjJGY852niZOnHbyUGnN/ilsXZfrR1aNlJ7Z7Og411pyMfloLL5Xu7Fx/m8uGTsk4fCq1GlCGqzkleb65PW+86EKcYfSjgV7utXeakm/D7bj7TM1wAAAAADgZXzSwuJu4x5Go/r00km/vQ2PwfSUzoRl0HUtdLXFHY3rLkfk9/l0FCy1kDEYJ/SR0qbdo1Ya4Pgn6r6H2XNSdKUN56a0v6Nyvke3ke/wB/zODlmBunVzfyJUx1TRjeNONuVqW1RXBcZMspwc2aN7ewtYZe1vcuX2PU8n4KnhqcaVKKjCK1cW97b3tm/GKisI8XWrTrTc5vLZ9BJUAAAAAAAAAADTjMRGjTnUlshFvr4LteoqrVY0qbnLciylTdSaguM85xNWVWcpy1ynJyfbu6jxU6sqknOW9nrKcVCKjHcjS4kZM8mLiTknJi4k5JyYuJlkyyRYknJvwOAqYmap01eT2t6oxXGT3IuoUp1Z6kP+Fda4hRhrzezxL7kTIdLBx5q0qrXOqta30L1V+9Z6a2tIUFs2vl/Nx5i7vqlw9uyPEvzezqm0aQAAAAAAAAAAMKtOM4uMoxlGStKMldNcGntDWTKMnF5i8NFLynmLpVouhNQozl9JGV26S4w9ZdD2fDVlb7dm49Bb6dxTaqrMluxx9fIW7J2Bp4anGlSjowj3t75N72zYjFRWEcOvXnWm5ze1n0mRSAAAAAAAAAAAAVvO/FaoUVv58+rZFd932I8/py4wo0Vx7X5fnQdbRlLa6j6l5lYcTz2Ts5MXEyyTkxcSck5MXEnJlkxcTLJOTZhcLOtONOCvKbsuC4t9CLaVOVWahDezCpVjTi5y3I9CyTk2GFpqENbeuc7a5y49XBHrra2jQhqx7Xynlrm5nXnrS7FyH2mwa4AAAAAAAAAAAAAAAAAAAAAAAAAAAAABRcqVuWrVJ7nK0fwrUvhftPB3tf41xOfFnC6lsXqelt4fDpRifG4mtkvyYuJlknJi4k5JyYuJlknJi4k5MslxzWyZyNPlZL6SqtX3ae5du3u4HqdFWnwqfxJfVLuXvv/wCHA0jc/EnqLcvE7p1jmgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHzZRrcnRqS3qDt1vUvFmre1vg2858i2dfF3ltCGvUjHpKTonz9M9HkxcSck5MXEyyTkxcSck5MXEyyTk+vJGC5etCDXNXOn+FbV26l2m7YUP3FeMHu3vqXruKLqt8Kk5LfuXWXw9ueaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABy84p2o29ecV2K7+SOJp+pq2urzml5+Ru2Mc1c8iKy4njMnYyYuJlknJi4k5JyYuJlknJi4k5MslkzUw9o1Km+UlFdS1vxfgeo0BRxTlVfG8LqXu+45GkqmZKHJtO8egOYAAAAAAAAAVHOjOyrgcRyMKVOa5KE7ybTu3JW1dR17LR0LilruTW3Bz7m8lSnqpcRyPOFX9hR96Rt8C0+c+41+Ep81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81DzhV/YUfekOBafOfcOEp81HezSzmnj6lWE6cIOnCMo6Lbvrad79hoX9hG2ipRecm3aXTrNprGCznMN042cb1U10yfdb9Ty/6lnhU49b+2PU6FgvqfUcNxPK5OlkxcTLJOTFxJyTkxcTLJOTFxJyTkuGRqehh6S4x0ved/me90XT1LSmuVZ++3zODdS1q0n+bD7TfNcAAAAAAAAA8w8o388v7an+aZ6fRH9ftfkcPSH83YvMrB1DRAAAAAAAAAAAAAAAABavJvK2NmvWwtTvVSn/6crTC/wDHX/0vBm/o5/5n1PxR6YeZO2cTOH0qf4ZfFHkf1M/np9T8jpWO6RyDzBvEWJyCHEnJOTFxJyTkxcSdbYTkueGjaEFwhFeB9Mt46tKKXEl4Hn6jzNvpNpaYAAAAAAAAAHmHlG/nl/bU/wA0z0+iP6/a/I4ekP5uxeZWDqGiAAAAAAAAAAAAAAAACzeTt/55dNCp8YnM0v8A1+1eZvaP/m7H5HqB5c7hxM4Vrp9UvijyX6mXz030PyOjY7pHIPLm+AQRcAi4IIYILjh3eEHxhH4H1Cg9alF9C8DiT+pmwtMQAAAAAAAADzDyjfzy/tqf5pnp9Ef1+1+Rw9Ifzdi8ysHUNEAAAAAAAAAAAAAAAAFl8ni/zy6KFT/qczS39ftRvaP/AJux+R6ieXO4cjOGPNpvg5LvS/Q8x+poZhTnyNr7r2N+xe2SOGeROgRcEEAggEAAteSqmlQpvhFR93V8j6LoqoqlnTa5MfbZ5HIrrFRn1nQKgAAAAAAAADzDyjfzy/tqf5pnp9Ef1+1+Rw9Ifzdi8ysHUNEAAAAAAAAAAAAAAAAFr8m1O+MqS3Rws+91IW+DOTph/wCBL/28mb+jl/lb6PNHpZ5o7Zz8uwvRb9SUX8vmcXT9PXs2+a0/LzNq0lip1laPCHUAIIBBFwQQCDv5t17xnDfGWkup/wDq8T2P6cr61KVJ/wCryup+/iaF3H5lI7J6Q1AAAAAAAAACgZ8ZExWIxanRozqQ5CEdJONrqUrrW+lHoNGXVGlQ1Zyw8vyOTe0Kk6uYxysepX/4Xx/2Wp3w/U6HCFtz13+hqftK/N8B/C+P+y1O+H6kcIW3PXf6D9pX5vgP4Xx/2Wp70P1HCFtz13+g/aV+b4D+F8f9lqe9D9Rwhbc9d/oP2lfm+A/hfH/ZanvQ/UcIW3PXf6D9pX5vgP4Xx/2Wp70P1HCFtz13+g/aV+b4GvE5v4yjCVSph5xhBXlJuNkuxmcL2hOSjGWW+sxlbVYrMo7Ow5hslAAAAAABePJhS52KnwjRin1ubfwRw9NS2Qj1+R1NGLbJ9XmX44B1jVi6WnTnH1otLrtqNe7o/GoTp8qaM6ctWSZTj5kdki4IIuAQ2DFswlIySK3I35LxvI1oyfovmz/C/wBNT7DpaLuf21xGb3PY+p+m816vzRwXU+gmkAAAAAAAAAAAAAAAAAAACseUTFcngnDfXq04LqT03+W3adHRcM19bkT9PM0NJT1aOOVr18jy89MpHBTJMkzLIMiQAAD0vyb4fQwkpv8ArV5tfhilH4qR5rTE811HkXudvR0cUm+V+xazkm+ACpZVo8nWmtzekup6/jddh870tb/Au5x4m8rt98o61GetBM+Rs5xZkwcicGDka5TM0ipzNcpmSRTKZrlMzSKpTLXmxlLlYclJ8+kub96G7u2dx7HQt78Wl8KT+aPevbd9ihvadw7YAAAAAAAAAAAAAAAAAAPMfKHlJVsUqUXeOGi0/wD6Ss5dyUV3ne0bT1Kes/8AbwPPaTra9XUX+viyrHTUjn5BmpGSYM1IyTJMkzLJDdjJbScns+b+D/w+EoUmrShSjpr7750v+TZ4y7q/FrSnyvu4u49Jbw1KcY9B0DXLgAcbOTD3hGovqPRl+F7PH4nm/wBRWuvTjWW+Ox9T9/E2raphuJWpTPIpGy5muUzJIqczXKZmkVSma5TMkimUzVKZmkVORNDFSpTjODtKDun+9xdRqSpTU4b0VOZf8jZUhi6elHVKNlUhvjL9HuPb2d5C5p60d/GuT84iyE1JH3m2ZgAAAAAAAAAAAAAAHGzpy5HAUHLU61RONCD3y9Zr1Ve77FvNi2oOrPHFxmne3St6eeN7vzkR5DObk3KTblJuUm9rbd232noYtJYR5bWbeWQZqROQZKROSTNSMsgzUjJM6mbGA/xWLoU7Xip6dThoQ5zv12S/3FF3X+FRlLj3Lrf5k2bWHxKsY9v2/MHsZ5I9MAAAYVqSnGUZbJJp9TK6tONWDhLc1glPDyULGUpUpyhLbB26+D7VrPnde3lQqypy3p/8fabGvlZPmlMwSK5TNcpmSRS5muUzJIqlM1SmZpFMpmuUjLBU5G7AY2ph6iqU5WktvCS3xkt6L6FedCanB7fHoZjGbi8o9AyJlyljI2XNqpc6m3r648UeutL6ncLZsfGvzejep1Yz6zqG6WgAAAAAAAAAAAHJzhy/RwFPSnzqkl9HST503xfCPT8dhbSoyqPCNS7vIW8cy38S5TybKeUKuLqyq1paU5dkYx3RityX71nbpQjCOrE8pVrzrTc5vb+bEfKWZK8gyUjJMkzUjLIM1IyyDJSJyei+TfJehSniZLnV3oU+inF632y/KjjaTr60lTXFv6/zxO9oujiDqPj3dXuXM5R1QAAAAV/OvJ+nDlornU1aa4w49n72HB03ZfEh8aK2x39Xt4DOCnymeWSK5TNcpmSRTKZrlIzSKnIwbJK2yAYmLZnFENkRqOLUotxlF3UouzT4prYXwynlFTljai05IzylG0MTFyWzlYLnL8Ud/Z3M7ltpOS2VVnpXmvT7GzTvcbJ/ctuCx9HER0qVSE1vs9a61tXadenVhUWYPJvwqQmsxeT6SwzAAAAAANWIxEKUXOpOEILbKclFLtYSyYznGCzJ4RTcu5+QinDCLTls5aatBfhi9cu2y6zZp0M7ZHFutMRXy0dr5Xu9/wA3lCxWInWnKpUnKc5u8pSd2zoQSSwjgznKcnKTy2aS+LMSTMkAkE5GQZJmWToZDyZPG14UY3Sk71JL6lNelL5LpaMatdUoOTNi2ouvUUF29R7Lh6MacIwglGFOKjGK2KKVkjzkpOTbfGeujFRSityNhBkAAAACGr6nse0bwef5yZLeFqXinyVRt036r3wfyPHaRsf29TMfpe7o6PToNWqtVnFbOfg12yAQAYkMySIbMGy6KK2zFsuiilswbLooqkyIVJQalGUoyWyUW4yXU0XwTTyirWaeUdfCZ242lq5SNRLdVhpeKs32s36d1VXHnrL46Qrw489f4jqUs/5r08NF8XGq4+Di/ibUbt8aLlphrfDv9jf5waf2ar78TYjVytxlw3DmPuNFXyh+phe2Vb5KPzLE8lctOc2n937HLxmfONqXUOSorjCGlLvldeBYkjVqaYuJfThdXv6FexmLq15aVWpUqS3OcnK3VfZ2F8dm451SrOo8zees0F8WYEF0WCC+LJILUCQSASTCDk1GKcpSaUYpXcm3ZJLew3jaEm3hHrWaGQFgKPOs69W0qr26PCCfBeLbOLc1/iy2bluPWWFp+3p7fqe/0O8axvAAAAAAAA+fHYOGIpyp1FeMl2p7mulFVajCtBwnuZjKKksM84yrk6phKjhPWtsJpapx4r5rceMurWdtPVl2PlNCcXB4Z8RrFZBKQMWy2KK5MwbL4opbMGy6KKpMxbLooqbMGy+KKWzBsuiiqTMGy6KKpMwZswKiC+LBBfFgguiySC6LBBdFggviySC6LAMwZRTbSSbbaSSV229iSIewyW3Yj0rMzNb/AAqWIrpcu1zIbeRTX5n4bDk3Vzr/ACx3eJ6TR9h8L/JU+rw9y3GkdYAAAAAAAAAAHy5SyfTxVN06iutsWvSjLinxKLi3hXhqTXsYzgpLDPO8r5KqYSejNXi/QqJc2a+T6DyF1ZVLaWJbuJ8vv0HPqQcHtOc2UxRS2Ytl0UUtmDZfFFTZg2XRRU2YNl0UUtmDZfFFTZi2XRRU2YNlyRU2QZogguiwQXRYILosEF0WSC+LBBdFkkF0WCadOU5KMYylKTSjGKvKTexJLaW5SWWSouTwltPTMz801hLV66UsQ1zY7Y0U/jLp3buL5NzdfE+WO7xPTaP0cqPz1Pq8PcthpHVAAAAAAAAAAAAABqxWGhWg4VIqUJbU/wB6mYVKcKkXGaymRKKksMomXs2KmHvOlpVaW1pK9SmulLaulf8Ap5660ZKl81PbHvXqc2vbyjtjtRW2zSijQbMWy+KKpMwbLoopkzBsviipswbLooqbMGy6KKmyDMxAALIsEF0WCC+LBBdFkkF0WCC6LB9mSslV8ZPQowcmraUnqhBcZS3fEslVjBZkX0LepXlqwXoj07NrNijgFpf6ldrnVWtn3YL6q8X4HOrXEqmziPUWdhC3Wd8uX0O8a5vAAAAAAAAAAAAAAAAAAHBy1mtQxN5x+hqvW5RXNk/vR39aszSr2NOo9ZbH+b0alezhU2rYyj5WyFicJd1INwX9WHOhbpf1e2xzZ21SnvWzlONXt6lLbJbOXiOS2Io0mzFsviipswbLooqbMSwwAAABkgQXRYILosEF0WDZhsNUrSUKcJ1JvZGEXJ9erYi5SxvM6dOVSWrBZfQXLImYUpWni5aK28jTd5PolPYuy/WjGVxj6Tt22h2/mrPsXm/T7l5weEp0IKnShGEI7IxVl19LNZycnlndp04046sFhG8gzAAAAAAAAAAAAAAAAAAAAAABxMpZq4PEXfJ8lN/Xpcx34uPovuKJW8JcX2NKto+hV24w+jZ7FZx+YdeN3Rq06i9WadOXVdXT8Cr9s1uZyq2h6i/jkn17PXyODi83sbR9PDVuuEeUXfC41JLiOdUsbiH1QfZt8MnMqRcXaScXwkrPuZiajTi8PYRcEZDAI0lxQGUfThsn161uTo1p33xpya77WLY5LoUKs/pi32M7ODzKx1X0oQpLjUmr26o38bF8cm7T0Tcz3pLrfpksWTswaELOvUnWfqx+jh4c7xRnrM6dHQ1KO2o89y9e8tODwVLDx0KVOFOPCEUr9L4sjJ1adKFNYgsLoN4LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD48qf6bMZbiqr9J51lvazVkeduzk4L0jE0KP1F+za2o2KZ6S0LSXHSAAAAAAAAAAAAAAAAAAP/2Q==" alt="Google Logo">
                     </a>
+                </div>
+
+                <!-- Google Provider Warning -->
+                <div style="
+                    margin: 0 0 20px 0;
+                    padding: 12px 16px;
+                    background: rgba(251,191,36,.07);
+                    border: 1px solid rgba(251,191,36,.28);
+                    border-right: 4px solid #fbbf24;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                ">
+                    <i class="fas fa-exclamation-triangle" style="color:#fbbf24;font-size:14px;flex-shrink:0;margin-top:3px;"></i>
+                    <p style="
+                        color:rgba(255,255,255,.75);
+                        font-size:12px;
+                        font-weight:700;
+                        line-height:1.8;
+                        margin:0;
+                        text-align:right;
+                        font-family:'Cairo',sans-serif;
+                    ">
+                        <span style="color:#fbbf24;font-weight:900;">تنبيه:</span>
+                        عند تسجيل الدخول عبر Google سيُعيَّن اسمك تلقائياً كـ
+                        <span style="
+                            color:#00f2ff;
+                            font-weight:900;
+                            font-family:'Orbitron',sans-serif;
+                            font-size:11px;
+                            background:rgba(0,242,255,.08);
+                            border:1px solid rgba(0,242,255,.25);
+                            padding:1px 7px;
+                            border-radius:5px;
+                        ">Agent</span>
+                        <br>
+                        لتغييره اذهب إلى
+                        <a href="account.html" style="
+                            color:#00f2ff;
+                            font-weight:900;
+                            text-decoration:none;
+                            border-bottom:1px solid rgba(0,242,255,.35);
+                            padding-bottom:1px;
+                            transition:color .2s;
+                        " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#00f2ff'">حسابي</a>
+                        <span style="color:rgba(255,255,255,.35);margin:0 4px;">←</span>
+                        <a href="account.html" style="
+                            color:#a78bfa;
+                            font-weight:900;
+                            text-decoration:none;
+                            border-bottom:1px solid rgba(167,139,250,.35);
+                            padding-bottom:1px;
+                            transition:color .2s;
+                        " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a78bfa'">تغيير اسم المستخدم</a>
+                    </p>
                 </div>
 
                 <div class="footer-links">
@@ -772,7 +768,7 @@ const firebaseConfig = {
     // Register Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register('./sw.js')
                 .then(reg => console.log('[SW] Registered'))
                 .catch(err => console.log('[SW] Error', err));
         });
