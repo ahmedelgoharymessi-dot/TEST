@@ -230,6 +230,7 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         let currentUser = null;
 
@@ -323,5 +324,6 @@ const firebaseConfig = {
     window.confirm = (msg)             => UIConfirm(msg);
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
+<script src="moderation.js"></script>
 </body>
 </html>

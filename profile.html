@@ -167,7 +167,7 @@
 
                 <!-- Player Info -->
                 <div class="flex-1 text-center md:text-right">
-                    <h2 id="playerUsername" class="text-5xl font-black neon-text mb-2">Loading...</h2>
+                    <h2 id="playerUsername" class="text-5xl font-black neon-text mb-2">. . . Loading</h2>
                     <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
                         <span id="playerRank" class="text-gray-400 text-sm">Bronze · Division III</span>
                         <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
@@ -329,6 +329,7 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         // Load particle system
         const script = document.createElement('script');
@@ -526,5 +527,6 @@ const firebaseConfig = {
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <script src="moderation.js"></script>
 </body>
 </html>

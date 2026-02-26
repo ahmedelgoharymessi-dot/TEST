@@ -379,7 +379,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
         
 const firebaseConfig = {
@@ -395,17 +395,24 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         let firebase_auth_user = null;
         let _roomInitialized = false;
 
-        onAuthStateChanged(auth, (user) => {
-            firebase_auth_user = user;
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
 
+            // ── MODERATION: single correct init ──────────────────
+            window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
             if (window.MOD) {
-                MOD.init(db, user ? user.uid : null, ref, update, get);
-                MOD.checkOnLoad();
+                await MOD.init(db, user);
+                // If banned → ban screen covers everything, stop here
+                if (document.getElementById('_ej_ban')) return;
             }
+            // ─────────────────────────────────────────────────────
+
+            firebase_auth_user = user;
 
             if (!_roomInitialized) {
                 _roomInitialized = true;
@@ -860,16 +867,22 @@ const firebaseConfig = {
 
         document.getElementById('sendDiscussionBtn').onclick = async () => {
             const input = document.getElementById('discussionInput');
-            const msg = input.value.trim();
-            if(!msg) return;
+            const msg   = input.value.trim();
+            if (!msg) return;
 
-            if (window.MOD && await MOD.checkAndHandleMessage(msg, myName)) {
-                input.value = '';
-                return;
+            // ── MODERATION SCAN ──────────────────────────────────
+            // MOD.scan returns true = message is blocked (warn/ban handled internally)
+            if (window.MOD) {
+                const blocked = await MOD.scan(msg);
+                if (blocked) {
+                    input.value = ''; // clear bad text from input
+                    return;           // do NOT send
+                }
             }
-            
+            // ─────────────────────────────────────────────────────
+
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            const d = snap.val();
+            const d    = snap.val();
             let messages = d.discussionMessages || [];
             messages.push({ player: myName, msg: msg });
             await update(ref(db, 'rooms/' + myRoom), { discussionMessages: messages });
@@ -1225,5 +1238,6 @@ const firebaseConfig = {
     window.confirm = (msg)             => UIConfirm(msg);
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
+<script src="moderation.js"></script>
 </body>
 </html>

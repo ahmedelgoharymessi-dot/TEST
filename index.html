@@ -1307,10 +1307,13 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         // Track auth state so Firebase SDK knows the user is logged in
         let currentUser = null;
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
+            await MOD.init(db, user);
+            if (document.getElementById('_ej_ban')) return;
             currentUser = user;
             // Init moderation system and check ban on every load
             if (window.MOD) {
@@ -1739,7 +1742,7 @@ const firebaseConfig = {
                 databaseURL:"https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
                 projectId:"el-jasus", appId:"1:415659587906:web:782f7940176ea4097eb0db"
             });
-            const db   = getDatabase(app);
+            const db = getDatabase(app);
             const snap = await get(ref(db, 'announcements'));
             if (!snap.exists()) return;
 
@@ -1772,6 +1775,6 @@ const firebaseConfig = {
     window.confirm = (msg)             => UIConfirm(msg);
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
-
+<script src="moderation.js"></script>
 </body>
 </html>

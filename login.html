@@ -15,13 +15,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="moderation.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Cairo', sans-serif;
@@ -36,17 +34,14 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background Grid */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,242,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,242,255,.03) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: gridMove 20s linear infinite;
             pointer-events: none;
@@ -54,103 +49,81 @@
         }
 
         @keyframes gridMove {
-            0% { transform: translateY(0); }
+            0%   { transform: translateY(0); }
             100% { transform: translateY(50px); }
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-            z-index: 1;
-        }
+        .container { width: 100%; max-width: 500px; position: relative; z-index: 1; }
 
         .logo-section {
             text-align: center;
             margin-bottom: 30px;
-            animation: fadeInDown 0.6s ease;
+            animation: fadeInDown .6s ease;
         }
 
         .logo-section img {
-            width: 100px;
-            height: 100px;
+            width: 100px; height: 100px;
             border-radius: 50%;
             border: 3px solid #00f2ff;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0,242,255,.5);
             margin-bottom: 20px;
             animation: logoFloat 3s ease-in-out infinite;
         }
 
         @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-10px); }
         }
 
         .logo-section h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
+            font-size: 2.5rem; font-weight: 900;
             text-transform: uppercase;
             background: linear-gradient(135deg, #00f2ff, #7c30ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
         }
 
         .logo-section p {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            color: #00f2ff;
+            font-size: .9rem; color: #00f2ff;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.8;
+            letter-spacing: 3px; opacity: .8;
         }
 
-        /* Glass Login Box */
         .login-box {
-            background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
+            background: linear-gradient(135deg, rgba(15,20,35,.9), rgba(25,30,50,.8));
             backdrop-filter: blur(20px);
             border: 2px solid;
-            border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
+            border-image: linear-gradient(135deg, rgba(0,242,255,.3), rgba(124,48,255,.3)) 1;
             border-radius: 25px;
             padding: 40px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 30px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(0,242,255,.1);
             position: relative;
             overflow: hidden;
-            animation: fadeInUp 0.6s ease;
+            animation: fadeInUp .6s ease;
         }
 
         .login-box::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(0, 242, 255, 0.05),
-                transparent
-            );
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0,242,255,.05), transparent);
             animation: shimmer 3s infinite;
             pointer-events: none;
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            0%   { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%)  translateY(100%)  rotate(45deg); }
         }
 
         .login-box h2 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 900;
+            font-size: 1.8rem; font-weight: 900;
             color: #fff;
             margin-bottom: 30px;
             text-align: center;
@@ -162,26 +135,20 @@
         .login-box h2::after {
             content: '';
             position: absolute;
-            bottom: -10px;
-            left: 50%;
+            bottom: -10px; left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
+            width: 60px; height: 3px;
             background: linear-gradient(90deg, #00f2ff, #7c30ff);
             border-radius: 2px;
         }
 
-        .form-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
+        .form-group { margin-bottom: 25px; position: relative; }
 
         .form-group label {
             display: block;
             margin-bottom: 10px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.9rem;
+            color: #fff; font-weight: 700;
+            font-size: .9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -189,53 +156,43 @@
         .form-group input {
             width: 100%;
             padding: 15px;
-            background: rgba(0, 242, 255, 0.05);
-            border: 2px solid rgba(0, 242, 255, 0.2);
+            background: rgba(0,242,255,.05);
+            border: 2px solid rgba(0,242,255,.2);
             border-radius: 12px;
             color: #fff;
             font-size: 1rem;
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
             outline: none;
         }
 
         .form-group input:focus {
-            background: rgba(0, 242, 255, 0.1);
+            background: rgba(0,242,255,.1);
             border-color: #00f2ff;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0,242,255,.3);
         }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
+        .form-group input::placeholder { color: rgba(255,255,255,.3); }
 
-        /* Custom Checkbox */
         .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0;
-            cursor: pointer;
-            user-select: none;
+            display: flex; align-items: center; gap: 12px;
+            margin: 20px 0; cursor: pointer; user-select: none;
         }
 
-        .checkbox-container input {
-            display: none;
-        }
+        .checkbox-container input { display: none; }
 
         .custom-checkbox {
-            width: 22px;
-            height: 22px;
-            background: rgba(0, 242, 255, 0.1);
-            border: 2px solid rgba(0, 242, 255, 0.3);
+            width: 22px; height: 22px;
+            background: rgba(0,242,255,.1);
+            border: 2px solid rgba(0,242,255,.3);
             border-radius: 6px;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
         }
 
         .checkbox-container:hover .custom-checkbox {
             border-color: #00f2ff;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0,242,255,.3);
         }
 
         .checkbox-container input:checked + .custom-checkbox {
@@ -246,28 +203,18 @@
         .custom-checkbox::after {
             content: '';
             position: absolute;
-            left: 6px;
-            top: 2px;
-            width: 6px;
-            height: 12px;
+            left: 6px; top: 2px;
+            width: 6px; height: 12px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity .3s ease;
         }
 
-        .checkbox-container input:checked + .custom-checkbox::after {
-            opacity: 1;
-        }
+        .checkbox-container input:checked + .custom-checkbox::after { opacity: 1; }
+        .checkbox-label { color: #fff; font-size: .9rem; font-weight: 600; }
 
-        .checkbox-label {
-            color: #fff;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        /* Buttons */
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -275,13 +222,12 @@
             border: none;
             border-radius: 12px;
             color: #fff;
-            font-size: 1.1rem;
-            font-weight: 900;
+            font-size: 1.1rem; font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transition: all .3s ease;
+            box-shadow: 0 0 20px rgba(0,242,255,.4);
             position: relative;
             overflow: hidden;
             font-family: 'Orbitron', sans-serif;
@@ -290,217 +236,144 @@
         .btn-primary::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,.3);
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            transform: translate(-50%,-50%);
+            transition: width .6s, height .6s;
         }
 
-        .btn-primary:hover::before {
-            width: 300%;
-            height: 300%;
-        }
+        .btn-primary:hover::before { width: 300%; height: 300%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,242,255,.6); }
+        .btn-primary:active { transform: translateY(0); }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        /* Divider */
         .divider {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin: 25px 0;
+            display: flex; align-items: center;
+            gap: 15px; margin: 25px 0;
         }
 
         .divider::before,
         .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.3), transparent);
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,242,255,.3), transparent);
         }
 
         .divider span {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.85rem;
+            color: rgba(255,255,255,.5);
+            font-size: .85rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-family: 'Orbitron', sans-serif;
         }
 
-        /* Social Login */
         .social-login {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
+            display: flex; justify-content: center;
+            gap: 15px; margin: 20px 0;
         }
 
         .social-btn {
-            width: 55px;
-            height: 55px;
+            width: 55px; height: 55px;
             border-radius: 50%;
-            background: rgb(255, 255, 255);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #fff;
+            border: 2px solid rgba(255,255,255,.1);
+            display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
             text-decoration: none;
         }
 
-        .social-btn img {
-            width: 28px;
-            height: 28px;
-        }
+        .social-btn img { width: 28px; height: 28px; }
 
         .social-btn:hover {
-            background: rgb(255, 255, 255);
             border-color: #00f2ff;
             transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgb(0, 242, 255);
+            box-shadow: 0 5px 20px #00f2ff;
         }
 
-        /* Footer Links */
         .footer-links {
             text-align: center;
             margin-top: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            color: rgba(255,255,255,.7);
+            font-size: .9rem;
         }
 
         .footer-links a {
-            color: #00f2ff;
-            text-decoration: none;
-            font-weight: 700;
-            transition: color 0.3s;
+            color: #00f2ff; text-decoration: none;
+            font-weight: 700; transition: color .3s;
         }
 
-        .footer-links a:hover {
-            color: #7c30ff;
-            text-decoration: underline;
-        }
+        .footer-links a:hover { color: #7c30ff; text-decoration: underline; }
 
-        /* Return Home Button with Animated Border */
         .return-home-btn {
             margin-top: 30px;
             padding: 15px 30px;
-            width: 100%;
-            max-width: 300px;
-            height: 65px;
-            border: none;
-            outline: none;
-            color: #fff;
-            background: #0a0e1a;
+            width: 100%; max-width: 300px; height: 65px;
+            border: none; outline: none;
+            color: #fff; background: #0a0e1a;
             cursor: pointer;
-            position: relative;
-            z-index: 0;
+            position: relative; z-index: 0;
             border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 900;
+            font-size: 1rem; font-weight: 900;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
+            display: flex; align-items: center;
+            justify-content: center; gap: 10px;
+            transition: all .3s ease;
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-left: auto;
-            margin-right: auto;
+            margin-left: auto; margin-right: auto;
         }
 
         .return-home-btn::before {
             content: '';
-            background: linear-gradient(45deg, 
-                #6600ff, #9900ff, #0066ff, #0033ff, 
-                #3300ff, #6600ff, #9900ff, #cc00ff,
-                #00d4ff);
+            background: linear-gradient(45deg,#6600ff,#9900ff,#0066ff,#0033ff,#3300ff,#6600ff,#9900ff,#cc00ff,#00d4ff);
             position: absolute;
-            top: -3px;
-            left: -3px;
+            top: -3px; left: -3px;
             background-size: 400%;
             z-index: -1;
             filter: blur(6px);
-            width: calc(100% + 6px);
-            height: calc(100% + 6px);
+            width: calc(100% + 6px); height: calc(100% + 6px);
             animation: glowingBorder 8s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            opacity: 0; transition: opacity .3s ease;
             border-radius: 15px;
         }
 
-        .return-home-btn:hover::before {
-            opacity: 1;
-        }
+        .return-home-btn:hover::before { opacity: 1; }
 
         .return-home-btn::after {
-            z-index: -1;
-            content: '';
+            z-index: -1; content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background: linear-gradient(135deg, #0a0e1a, #1a1535);
-            left: 0;
-            top: 0;
-            border-radius: 15px;
+            left: 0; top: 0; border-radius: 15px;
         }
 
         @keyframes glowingBorder {
-            0% { background-position: 0 0; }
-            50% { background-position: 400% 0; }
+            0%   { background-position: 0 0; }
+            50%  { background-position: 400% 0; }
             100% { background-position: 0 0; }
         }
 
-        .return-home-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 30px rgba(0, 212, 255, 0.4);
-        }
+        .return-home-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 30px rgba(0,212,255,.4); }
+        .return-home-btn:active { transform: translateY(-1px); }
 
-        .return-home-btn:active {
-            transform: translateY(-1px);
-        }
-
-        /* Animations */
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Logo Section -->
+
+        <!-- Logo -->
         <div class="logo-section">
             <img src="ElJasus2.png" alt="El Jasus Logo">
             <h1>EL-JASUS</h1>
@@ -510,7 +383,7 @@
         <!-- Login Box -->
         <div class="login-box">
             <h2>تسجيل الدخول</h2>
-            
+
             <form id="loginForm">
                 <div class="form-group">
                     <label>البريد الإلكتروني</label>
@@ -522,11 +395,12 @@
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
 
+                <!-- Show password toggle -->
                 <label class="checkbox-container" style="margin-top:-8px;margin-bottom:8px;">
                     <input type="checkbox" id="showPasswordToggle" onchange="
-                        var p=document.getElementById('password');
-                        p.type=this.checked?'text':'password';
-                        document.getElementById('eyeIconLogin').className=this.checked?'fas fa-eye-slash':'fas fa-eye';
+                        var p = document.getElementById('password');
+                        p.type = this.checked ? 'text' : 'password';
+                        document.getElementById('eyeIconLogin').className = this.checked ? 'fas fa-eye-slash' : 'fas fa-eye';
                     ">
                     <span class="custom-checkbox"></span>
                     <span class="checkbox-label" style="display:flex;align-items:center;gap:6px;">
@@ -535,6 +409,7 @@
                     </span>
                 </label>
 
+                <!-- Stay signed-in -->
                 <label class="checkbox-container">
                     <input type="checkbox" id="forgot_password">
                     <span class="custom-checkbox"></span>
@@ -542,72 +417,41 @@
                 </label>
 
                 <button type="submit" class="btn-primary" id="loginBtn">
-                    <span style="position: relative; z-index: 1;">تسجيل الدخول</span>
+                    <span style="position:relative;z-index:1;">تسجيل الدخول</span>
                 </button>
 
-                <div class="divider">
-                    <span>أو</span>
-                </div>
+                <div class="divider"><span>أو</span></div>
 
+                <!-- Google login button -->
                 <div class="social-login">
-                    <a href="#" class="social-btn google-official">
-                        <img src="data:image/jpeg;base64,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" alt="Google Logo">
+                    <a href="#" class="social-btn" id="googleLoginBtn">
+                        <!-- Google "G" SVG – no external image needed -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="28" height="28">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                            <path fill="none" d="M0 0h48v48H0z"/>
+                        </svg>
                     </a>
                 </div>
 
-                <!-- Google Provider Warning -->
-                <div style="
-                    margin: 0 0 20px 0;
-                    padding: 12px 16px;
-                    background: rgba(251,191,36,.07);
-                    border: 1px solid rgba(251,191,36,.28);
-                    border-right: 4px solid #fbbf24;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 10px;
-                ">
+                <!-- Google provider warning -->
+                <div style="margin:0 0 20px;padding:12px 16px;
+                    background:rgba(251,191,36,.07);
+                    border:1px solid rgba(251,191,36,.28);
+                    border-right:4px solid #fbbf24;
+                    border-radius:12px;
+                    display:flex;align-items:flex-start;gap:10px;">
                     <i class="fas fa-exclamation-triangle" style="color:#fbbf24;font-size:14px;flex-shrink:0;margin-top:3px;"></i>
-                    <p style="
-                        color:rgba(255,255,255,.75);
-                        font-size:12px;
-                        font-weight:700;
-                        line-height:1.8;
-                        margin:0;
-                        text-align:right;
-                        font-family:'Cairo',sans-serif;
-                    ">
+                    <p style="color:rgba(255,255,255,.75);font-size:12px;font-weight:700;line-height:1.8;margin:0;text-align:right;font-family:'Cairo',sans-serif;">
                         <span style="color:#fbbf24;font-weight:900;">تنبيه:</span>
-                        عند تسجيل الدخول عبر Google سيُعيَّن اسمك تلقائياً كـ
-                        <span style="
-                            color:#00f2ff;
-                            font-weight:900;
-                            font-family:'Orbitron',sans-serif;
-                            font-size:11px;
-                            background:rgba(0,242,255,.08);
-                            border:1px solid rgba(0,242,255,.25);
-                            padding:1px 7px;
-                            border-radius:5px;
-                        ">Agent</span>
+                        عند تسجيل الدخول عبر Google سيُعيَّن اسمك تلقائياً من حسابك على Google.
                         <br>
                         لتغييره اذهب إلى
-                        <a href="account.html" style="
-                            color:#00f2ff;
-                            font-weight:900;
-                            text-decoration:none;
-                            border-bottom:1px solid rgba(0,242,255,.35);
-                            padding-bottom:1px;
-                            transition:color .2s;
-                        " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#00f2ff'">حسابي</a>
+                        <a href="account.html" style="color:#00f2ff;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(0,242,255,.35);">حسابي</a>
                         <span style="color:rgba(255,255,255,.35);margin:0 4px;">←</span>
-                        <a href="account.html" style="
-                            color:#a78bfa;
-                            font-weight:900;
-                            text-decoration:none;
-                            border-bottom:1px solid rgba(167,139,250,.35);
-                            padding-bottom:1px;
-                            transition:color .2s;
-                        " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a78bfa'">تغيير اسم المستخدم</a>
+                        <a href="account.html" style="color:#a78bfa;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(167,139,250,.35);">تغيير اسم المستخدم</a>
                     </p>
                 </div>
 
@@ -617,7 +461,6 @@
             </form>
         </div>
 
-        <!-- Return Home Button -->
         <a href="index.html" class="return-home-btn">
             <i class="fas fa-home"></i>
             العودة للرئيسية
@@ -625,154 +468,219 @@
     </div>
 
     <script>
-        
-const firebaseConfig = {
-  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-  authDomain: "el-jasus.firebaseapp.com",
-  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "el-jasus",
-  storageBucket: "el-jasus.firebasestorage.app",
-  messagingSenderId: "415659587906",
-  appId: "1:415659587906:web:782f7940176ea4097eb0db",
-  measurementId: "G-N4K79FP56N"
-};
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain:        "el-jasus.firebaseapp.com",
+            databaseURL:       "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId:         "el-jasus",
+            storageBucket:     "el-jasus.firebasestorage.app",
+            messagingSenderId: "415659587906",
+            appId:             "1:415659587906:web:782f7940176ea4097eb0db",
+            measurementId:     "G-N4K79FP56N"
+        };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
+        /* ════════════════════════════════════════════════════════════════
+           Helper: create or patch the player record in Realtime Database
+           so that username is NEVER undefined for leaderboard / admin panel.
+           Called after both email login AND Google login.
+        ════════════════════════════════════════════════════════════════ */
+        async function ensurePlayerRecord(user) {
+        try {
+            const { getDatabase, ref, get, update } =
+                await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js");
+
+            const db   = getDatabase();
+            const snap = await get(ref(db, `players/${user.uid}`));
+            const prev = snap.exists() ? snap.val() : {};
+
+            const patch = {};
+            if (!prev.username)    patch.username    = user.displayName || 'Agent';
+            if (!prev.email)       patch.email       = user.email || '';
+            if (prev.coins       == null) patch.coins       = 100;
+            if (prev.hints       == null) patch.hints       = 3;
+            if (prev.rankPoints  == null) patch.rankPoints  = 0;
+            if (!prev.rank)        patch.rank        = 'Bronze';
+            if (!prev.activeTheme) patch.activeTheme = 'cyan';
+            if (!prev.activeTitle) patch.activeTitle = 'rookie';
+            if (!prev.inventory)   patch.inventory   = { themes: ['cyan'], titles: ['rookie'] };
+            if (!prev.stats)       patch.stats       = {
+                totalGames: 0, spyWins: 0, innocentWins: 0,
+                currentStreak: 0, longestWinStreak: 0
+            };
+            if (!prev.createdAt) patch.createdAt = Date.now();
+
+            // ── NEW: moderation fields — always ensure these exist ──
+            if (prev.moderationWarnings == null) patch.moderationWarnings = 0;
+            if (prev.totalBans          == null) patch.totalBans          = 0;
+            // ────────────────────────────────────────────────────────
+
+            if (Object.keys(patch).length > 0) {
+                await update(ref(db, `players/${user.uid}`), patch);
+            }
+        } catch (e) {
+            console.warn('[ensurePlayerRecord]', e.message);
+        }
+    }
+
+        /* ════════════════════════════════════════════════════════════════
+           EMAIL / PASSWORD LOGIN
+        ════════════════════════════════════════════════════════════════ */
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+
+            const email        = document.getElementById('username').value.trim();
+            const password     = document.getElementById('password').value;
             const keepSignedIn = document.getElementById('forgot_password').checked;
-            const loginBtn = document.getElementById('loginBtn');
+            const loginBtn     = document.getElementById('loginBtn');
 
-            // Validation
-            if (!email) {
-                alert('الرجاء إدخال البريد الإلكتروني');
-                return;
+            if (!email)    { alert('الرجاء إدخال البريد الإلكتروني'); return; }
+            if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('الرجاء إدخال بريد إلكتروني صحيح'); return;
             }
 
-            if (!password) {
-                alert('الرجاء إدخال كلمة المرور');
-                return;
-            }
+            loginBtn.innerHTML = '<span style="position:relative;z-index:1;">جاري التحقق...</span>';
+            loginBtn.disabled  = true;
 
-            // Basic email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('الرجاء إدخال بريد إلكتروني صحيح');
-                return;
-            }
-
-            loginBtn.innerHTML = '<span style="position: relative; z-index: 1;">جاري التحقق...</span>';
-            loginBtn.disabled = true;
-
-            const persistence = keepSignedIn ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+            const persistence = keepSignedIn
+                ? firebase.auth.Auth.Persistence.LOCAL
+                : firebase.auth.Auth.Persistence.SESSION;
 
             auth.setPersistence(persistence)
-                .then(() => {
-                    return auth.signInWithEmailAndPassword(email, password);
-                })
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    const userName = user.displayName || "Agent";
-                    
-                    localStorage.setItem('eljasus_user_name', userName);
+                .then(() => auth.signInWithEmailAndPassword(email, password))
+                .then(async (cred) => {
+                    const user = cred.user;
+                    localStorage.setItem('eljasus_user_name',  user.displayName || 'Agent');
                     localStorage.setItem('eljasus_user_email', user.email);
-                    
+
+                    // Ensure DB record exists (covers Google-then-email edge cases)
+                    await ensurePlayerRecord(user);
+
                     // Daily login reward
-                    const uid = user.uid;
                     const today = new Date().toDateString();
-                    const lastLogin = localStorage.getItem('eljasus_last_login');
-                    if (lastLogin !== today) {
+                    if (localStorage.getItem('eljasus_last_login') !== today) {
                         localStorage.setItem('eljasus_last_login', today);
-                        // Award 10 coins for daily login
-                        import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js").then(async ({getDatabase, ref, get, update}) => {
-                            try {
-                                const db   = getDatabase();
-                                const snap = await get(ref(db, `players/${uid}/coins`));
-                                const curr = snap.val() || 0;
-                                await update(ref(db, `players/${uid}`), { coins: curr + 10, lastDailyLogin: Date.now() });
-                                localStorage.setItem('eljasus_daily_reward', '10');
-                            } catch(e) {}
-                        });
+                        import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js")
+                            .then(async ({ getDatabase, ref, get, update }) => {
+                                try {
+                                    const db   = getDatabase();
+                                    const snap = await get(ref(db, `players/${user.uid}/coins`));
+                                    await update(ref(db, `players/${user.uid}`), {
+                                        coins: (snap.val() || 0) + 10,
+                                        lastDailyLogin: Date.now()
+                                    });
+                                    localStorage.setItem('eljasus_daily_reward', '10');
+                                } catch(err) {}
+                            });
                     }
-                    window.location.href = "index.html"; 
+
+                    (async () => {
+                    // Init MOD with compat database
+                    if (window.MOD) {
+                        const db = firebase.database();
+                        // Set up _firebaseFns for compat SDK so MOD can use it
+                        window._firebaseFns = {
+                            ref:      (db, path) => firebase.database().ref(path),
+                            get:      (r)        => r.once('value'),
+                            update:   (r, v)     => r.update(v),
+                            onValue:  (r, cb)    => { r.on('value', snap => cb(snap)); return () => r.off('value'); },
+                            serverTimestamp: ()  => firebase.database.ServerValue.TIMESTAMP,
+                        };
+                        await MOD.init(db, user);
+                        // If banned → ban screen is showing — don't redirect
+                        if (document.getElementById('_ej_ban')) return;
+                    }
+                    window.location.href = 'index.html';
+                })();
+
                 })
                 .catch((error) => {
-                    console.error('Login Error:', error);
-                    
-                    let errorMessage = '';
-                    
-                    switch(error.code) {
-                        case 'auth/invalid-login-credentials':
-                        case 'auth/wrong-password':
-                            errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-                            break;
-                        case 'auth/user-not-found':
-                            errorMessage = 'لا يوجد حساب بهذا البريد الإلكتروني. يرجى إنشاء حساب جديد';
-                            break;
-                        case 'auth/invalid-email':
-                            errorMessage = 'البريد الإلكتروني غير صالح';
-                            break;
-                        case 'auth/user-disabled':
-                            errorMessage = 'هذا الحساب معطل';
-                            break;
-                        case 'auth/too-many-requests':
-                            errorMessage = 'تم حظر الحساب مؤقتاً بسبب محاولات دخول كثيرة. حاول لاحقاً';
-                            break;
-                        default:
-                            errorMessage = 'فشل تسجيل الدخول: ' + error.message;
-                    }
-                    
-                    alert(errorMessage);
-                    loginBtn.innerHTML = '<span style="position: relative; z-index: 1;">تسجيل الدخول</span>';
-                    loginBtn.disabled = false;
+                    const msgs = {
+                        'auth/invalid-login-credentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+                        'auth/wrong-password':            'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+                        'auth/user-not-found':            'لا يوجد حساب بهذا البريد الإلكتروني',
+                        'auth/invalid-email':             'البريد الإلكتروني غير صالح',
+                        'auth/user-disabled':             'هذا الحساب معطل',
+                        'auth/too-many-requests':         'تم حظر الحساب مؤقتاً. حاول لاحقاً',
+                    };
+                    alert(msgs[error.code] || 'فشل تسجيل الدخول: ' + error.message);
+                    loginBtn.innerHTML = '<span style="position:relative;z-index:1;">تسجيل الدخول</span>';
+                    loginBtn.disabled  = false;
                 });
         });
 
-        // Google Login
-        document.addEventListener('DOMContentLoaded', function() {
-            const googleLoginBtn = document.querySelector('.google-official');
-            
-            if (googleLoginBtn) {
-                googleLoginBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const googleProvider = new firebase.auth.GoogleAuthProvider();
-                    
-                    auth.signInWithPopup(googleProvider)
-                        .then((result) => {
-                            if (result.user && result.user.displayName) {
-                                localStorage.setItem('eljasus_user_name', result.user.displayName);
-                                localStorage.setItem('eljasus_user_email', result.user.email);
-                            }
-                            
-                            window.location.href = "index.html";
-                        })
-                        .catch(err => {
-                            alert("فشل تسجيل الدخول عبر Google: " + err.message);
-                        });
-                });
-            }
+        /* ════════════════════════════════════════════════════════════════
+           GOOGLE LOGIN
+           FIX 1: The original code had TWO auth.signInWithPopup() calls:
+             • One inside the click handler (correct)
+             • One OUTSIDE the click handler, which fired a popup on every
+               single page load – breaking the login page for all visitors.
+           FIX 2: After sign-in we now call ensurePlayerRecord() which
+             writes username / default fields to the DB if they are missing.
+             This stops Google users appearing as "undefined" in the
+             leaderboard and in the admin players table.
+        ════════════════════════════════════════════════════════════════ */
+        document.addEventListener('DOMContentLoaded', function () {
+            const googleBtn = document.getElementById('googleLoginBtn');
+            if (!googleBtn) return;
+
+            googleBtn.addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result   = await auth.signInWithPopup(provider);  // ← only ONE popup call
+                    const user     = result.user;
+
+                    localStorage.setItem('eljasus_user_name',  user.displayName || 'Agent');
+                    localStorage.setItem('eljasus_user_email', user.email || '');
+
+                    // Create / patch player DB record (FIX 2)
+                    await ensurePlayerRecord(user);
+
+                    if (window.MOD) {
+                    window._firebaseFns = {
+                        ref:      (db, path) => firebase.database().ref(path),
+                        get:      (r)        => r.once('value'),
+                        update:   (r, v)     => r.update(v),
+                        onValue:  (r, cb)    => { r.on('value', snap => cb(snap)); return () => r.off('value'); },
+                        serverTimestamp: ()  => firebase.database.ServerValue.TIMESTAMP,
+                    };
+                    await MOD.init(firebase.database(), user);
+                    if (document.getElementById('_ej_ban')) return;
+                }
+                window.location.href = 'index.html';
+
+                } catch (err) {
+                    // Silently ignore user-dismissed popup
+                    if (err.code !== 'auth/popup-closed-by-user' &&
+                        err.code !== 'auth/cancelled-popup-request') {
+                        alert('فشل تسجيل الدخول عبر Google: ' + err.message);
+                    }
+                }
+            });
         });
     </script>
+
     <link rel="stylesheet" href="mobile.css">
     <script src="sound-system.js" defer></script>
     <script src="qr-notifications.js" defer></script>
+    <script src="dialogs.js"></script>
     <script>
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('[SW] Registered'))
-                .catch(err => console.log('[SW] Error', err));
-        });
-    }
+        window.alert   = (msg)             => UIAlert(msg);
+        window.confirm = (msg)             => UIConfirm(msg);
+        window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () =>
+                navigator.serviceWorker.register('./sw.js')
+                    .catch(() => {})
+            );
+        }
     </script>
 </body>
 </html>

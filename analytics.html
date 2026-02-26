@@ -181,6 +181,7 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
+window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
 let currentUser = null;
 let selectedReason = '';
@@ -225,6 +226,8 @@ onAuthStateChanged(auth, async user => {
     currentUser = user;
     const snap = await get(ref(db, `players/${user.uid}`));
     if (!snap.exists()) return;
+    await MOD.init(db, user);
+    if (document.getElementById('_ej_ban')) return;
     userData = snap.val();
     const stats = userData.stats || {};
     renderKPIs(stats);
@@ -330,5 +333,6 @@ function renderHistory(history) {
     <script src="sound-system.js" defer></script>
     <script src="qr-notifications.js" defer></script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <script src="moderation.js"></script>
 </body>
 </html>

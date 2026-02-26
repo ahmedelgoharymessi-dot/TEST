@@ -464,6 +464,7 @@ const firebaseConfig = {
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         let allPlayers = [];
 
@@ -714,5 +715,6 @@ const firebaseConfig = {
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <script src="moderation.js"></script>
 </body>
 </html>

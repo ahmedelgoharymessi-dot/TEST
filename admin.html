@@ -145,6 +145,8 @@
         }
     </style>
 </head>
+<script src="admin-diagnostics-v2.js"></script>
+
 <body>
 
 <!-- SIDEBAR -->
@@ -254,25 +256,38 @@
         <!-- Ban form -->
         <div class="glass" style="padding:20px;margin-bottom:20px;">
             <h3 style="font-size:14px;font-weight:900;margin-bottom:16px;color:#f97316;">حظر لاعب جديد</h3>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">اسم المستخدم</label>
-                    <input id="ban-username" class="admin-input" type="text" placeholder="أدخل اسم المستخدم">
-                </div>
-                <div>
-                    <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">مدة الحظر</label>
-                    <select id="ban-duration" class="admin-input">
-                        <option value="86400000">24 ساعة</option>
-                        <option value="604800000">أسبوع</option>
-                        <option value="2592000000">شهر</option>
-                        <option value="-1">دائم</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">السبب</label>
-                    <input id="ban-reason" class="admin-input" type="text" placeholder="سبب الحظر">
-                </div>
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <div>
+        <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">اسم المستخدم</label>
+        <input id="ban-username" class="admin-input" type="text" placeholder="أدخل اسم المستخدم">
+    </div>
+    <div>
+        <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">نوع المخالفة</label>
+        <select id="ban-category" class="admin-input">
+            <option value="admin_decision">🔨 قرار إداري</option>
+            <option value="profanity">🤬 ألفاظ نابية</option>
+            <option value="spam">📵 رسائل مزعجة</option>
+            <option value="hate_speech">🚫 خطاب كراهية</option>
+            <option value="threats">💀 تهديدات</option>
+            <option value="harassment">⚠️ تحرش وإيذاء</option>
+            <option value="cheating">🎰 غش في اللعبة</option>
+            <option value="permanent">⛔ حظر دائم</option>
+        </select>
+    </div>
+    <div>
+        <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">مدة الحظر</label>
+        <select id="ban-duration" class="admin-input">
+            <option value="86400000">24 ساعة</option>
+            <option value="604800000">أسبوع</option>
+            <option value="2592000000">شهر</option>
+            <option value="-1">دائم ⛔</option>
+        </select>
+    </div>
+    <div>
+        <label style="font-size:11px;color:#666;font-weight:700;display:block;margin-bottom:6px;">السبب</label>
+        <input id="ban-reason" class="admin-input" type="text" placeholder="سبب الحظر">
+    </div>
+</div>
             <button class="btn-danger" onclick="banPlayer()">
                 <i class="fas fa-ban ml-2"></i>تطبيق الحظر
             </button>
@@ -589,6 +604,7 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
+window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
 // ADMIN ACCESS VIA CODE REDEMPTION
 const ADMIN_CODE = 'ADMIN26';
@@ -620,7 +636,8 @@ onAuthStateChanged(auth, async user => {
     // Admin verified - load dashboard
     document.getElementById('overview-date').textContent =
         new Date().toLocaleDateString('ar-SA', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    await refreshAll();
+        window._firebaseFns = { ref, get, update, onValue, push, set, remove };
+        await refreshAll();
 });
 
 // ── ADMIN CODE REDEMPTION ────────────────
@@ -1027,14 +1044,19 @@ function renderBans() {
         </tr>`).join('');
 }
 
-window.banPlayer = async () => {
+indow.banPlayer = async () => {
     const username = document.getElementById('ban-username').value.trim();
     const reason   = document.getElementById('ban-reason').value.trim();
     const duration = parseInt(document.getElementById('ban-duration').value);
-    if (!username) { await UIAlert('الرجاء إدخال اسم المستخدم', { title: 'حقل مطلوب', type: 'warning', icon: '✏️' }); return; }
+    const category = document.getElementById('ban-category')?.value || 'admin_decision';
 
-    // Find player UID
-    const snap = await get(ref(db,'players'));
+    if (!username) {
+        await UIAlert('الرجاء إدخال اسم المستخدم', { title: 'حقل مطلوب', type: 'warning', icon: '✏️' });
+        return;
+    }
+
+    // Find player UID by username
+    const snap = await get(ref(db, 'players'));
     if (!snap.exists()) return;
     const players = snap.val();
     let targetUid = null;
@@ -1042,27 +1064,75 @@ window.banPlayer = async () => {
         if (players[uid].username === username) { targetUid = uid; break; }
     }
 
-    if (!targetUid) { await UIAlert('لا يوجد لاعب بهذا الاسم في قاعدة البيانات', { title: 'المستخدم غير موجود', type: 'error', icon: '🔍' }); return; }
+    if (!targetUid) {
+        await UIAlert('لا يوجد لاعب بهذا الاسم', { title: 'المستخدم غير موجود', type: 'error', icon: '🔍' });
+        return;
+    }
 
-    await set(ref(db, `bans/${targetUid}`), {
-        username,
-        reason: reason || 'مخالفة اللوائح',
-        bannedAt:  Date.now(),
-        expiresAt: duration === -1 ? null : Date.now() + duration,
-        permanent: duration === -1,
-        bannedByName: 'Admin'
-    });
+    const isPermanent = duration === -1;
+    const now = Date.now();
+    const previousBans = players[targetUid]?.totalBans ?? 0;
+
+    // Build ban object — same schema as moderation.js
+    const banObj = {
+        reason:      reason || 'قرار إداري',
+        category:    category,
+        bannedAt:    now,
+        expiresAt:   isPermanent ? -1 : now + duration,
+        durationMs:  isPermanent ? -1 : duration,
+        bannedBy:    auth.currentUser?.uid || 'admin',
+        isPermanent: isPermanent,
+        banCount:    previousBans + 1,
+        username:    username,
+        email:       players[targetUid]?.email || '',
+    };
+
+    // Write to THREE paths so both old panel and new ban screen work:
+    await Promise.all([
+        // 1. New path — moderation.js reads this to show ban screen
+        update(ref(db, `players/${targetUid}`), {
+            ban:      banObj,
+            totalBans: previousBans + 1,
+            [`banHistory/${now}`]: {
+                reason: banObj.reason, category: banObj.category,
+                bannedAt: now, expiresAt: banObj.expiresAt, durationMs: banObj.durationMs
+            }
+        }),
+        // 2. New path — banned_users list (for admin overview)
+        update(ref(db, `banned_users/${targetUid}`), banObj),
+        // 3. Old path — keeps bans table in this admin panel working
+        set(ref(db, `bans/${targetUid}`), {
+            username,
+            reason:    banObj.reason,
+            bannedAt:  now,
+            expiresAt: banObj.expiresAt,
+            permanent: isPermanent,
+            bannedByName: 'Admin',
+        }),
+    ]);
 
     await UIAlert(`تم حظر ${username} بنجاح`, { title: '🚫 تم الحظر', type: 'success', icon: '✅' });
     document.getElementById('ban-username').value = '';
-    document.getElementById('ban-reason').value = '';
+    document.getElementById('ban-reason').value   = '';
     loadBans();
 };
 
+
 window.unban = async (uid) => {
-    const ok = await UIConfirm('هل أنت متأكد من رفع الحظر عن هذا اللاعب؟', { title: 'رفع الحظر', type: 'warning', confirmText: 'رفع الحظر', icon: '✅' });
+    const ok = await UIConfirm(
+        'هل أنت متأكد من رفع الحظر عن هذا اللاعب؟',
+        { title: 'رفع الحظر', type: 'warning', confirmText: 'رفع الحظر', icon: '✅' }
+    );
     if (!ok) return;
-    await remove(ref(db, `bans/${uid}`));
+
+    // Remove from ALL three paths so ban screen disappears live
+    await Promise.all([
+        update(ref(db, `players/${uid}`), { ban: null, moderationWarnings: 0 }),
+        remove(ref(db, `banned_users/${uid}`)),
+        remove(ref(db, `bans/${uid}`)),
+    ]);
+
+    await UIAlert('تم رفع الحظر بنجاح', { title: '✅ تم', type: 'success', icon: '' });
     loadBans();
 };
 
@@ -1866,5 +1936,6 @@ window.showSection = function(name) {
 
 </script>
 <script src="dialogs.js"></script>
+<script src="moderation.js"></script>
 </body>
 </html>

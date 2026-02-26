@@ -173,7 +173,8 @@
 
         const app  = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db   = getDatabase(app);
+        const db = getDatabase(app);
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         // ── DOM shortcuts ───────────────────────────────────────────────────────
         const el = id => document.getElementById(id);
@@ -294,7 +295,7 @@
 
         // ── Auth: sign in (anonymously if needed) then start listeners ─────────
         //    This mirrors the pattern used in room.html (onAuthStateChanged gate)
-        onAuthStateChanged(auth, user => {
+        onAuthStateChanged(auth, async user => {
             if (user) {
                 console.log('[onlinerooms] Auth OK uid=' + user.uid);
                 startListeners();
@@ -307,6 +308,8 @@
                         startListeners(); // attempt read anyway (open rules)
                     });
             }
+            await MOD.init(db, user);
+            if (document.getElementById('_ej_ban')) return;
         });
 
         // ── Filter & render ────────────────────────────────────────────────────
@@ -498,5 +501,6 @@
 </script>
     <script src="qr-notifications.js" defer></script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <script src="moderation.js"></script>
 </body>
 </html>
