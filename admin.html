@@ -587,7 +587,8 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update, remove, push, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+import { getDatabase, ref, get, set, update, remove, push, onValue, query, orderByChild, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
 
 const firebaseConfig = {
@@ -883,23 +884,43 @@ function renderRankDist() {
 // ── RECENT PLAYERS ────────────────────────
 function renderRecentPlayers() {
     const sorted = Object.values(allPlayers)
-        .filter(p => p.username && p.stats?.lastPlayed)
-        .sort((a,b) => (b.stats.lastPlayed||0) - (a.stats.lastPlayed||0))
+        // FIX: new players have no stats.lastPlayed yet — use createdAt as fallback
+        .filter(p => p.username)
+        .sort((a, b) => {
+            const aTime = a.stats?.lastPlayed || a.createdAt || 0;
+            const bTime = b.stats?.lastPlayed || b.createdAt || 0;
+            return bTime - aTime;
+        })
         .slice(0, 8);
 
-    document.getElementById('recent-players-list').innerHTML = sorted.map(p => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+    document.getElementById('recent-players-list').innerHTML = sorted.map(p => {
+        // Show lastPlayed if exists, else createdAt as "انضم:", else "جديد"
+        let timeLabel;
+        if (p.stats?.lastPlayed) {
+            timeLabel = new Date(p.stats.lastPlayed).toLocaleDateString('ar-SA');
+        } else if (p.createdAt) {
+            timeLabel = 'انضم: ' + new Date(p.createdAt).toLocaleDateString('ar-SA');
+        } else {
+            timeLabel = 'جديد';
+        }
+
+        return `
+        <div style="display:flex;align-items:center;justify-content:space-between;
+            padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
             <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00f2ff,#7c30ff);display:flex;align-items:center;justify-content:center;font-size:12px;">
+                <div style="width:32px;height:32px;border-radius:50%;
+                    background:linear-gradient(135deg,#00f2ff,#7c30ff);
+                    display:flex;align-items:center;justify-content:center;font-size:12px;">
                     <i class="fas fa-user" style="color:white;"></i>
                 </div>
                 <div>
                     <p style="font-size:12px;font-weight:700;">${p.username}</p>
-                    <p style="font-size:10px;color:#555;">${new Date(p.stats.lastPlayed).toLocaleDateString('ar-SA')}</p>
+                    <p style="font-size:10px;color:#555;">${timeLabel}</p>
                 </div>
             </div>
             <span style="font-size:11px;font-weight:900;color:#00f2ff;">${p.rank || 'Bronze'}</span>
-        </div>`).join('') || '<p style="color:#555;font-size:12px;text-align:center;padding:20px;">لا يوجد لاعبون</p>';
+        </div>`;
+    }).join('') || '<p style="color:#555;font-size:12px;text-align:center;padding:20px;">لا يوجد لاعبون</p>';
 }
 
 // ── ANALYTICS ────────────────────────────
@@ -954,12 +975,14 @@ function loadAnalytics() {
         const total = p.stats?.totalGames||0;
         const wins  = (p.stats?.spyWins||0) + (p.stats?.innocentWins||0);
         const wr    = total ? Math.round(wins/total*100) : 0;
-        return `<tr><td style="color:#555;">${i+1}</td>
-            <td style="font-weight:700;">${p.username}</td>
-            <td><span class="badge badge-active">${p.rank||'Bronze'}</span></td>
-            <td style="font-family:'Orbitron',sans-serif;color:#00f2ff;font-size:12px;">${p.rankPoints||0}</td>
-            <td>${total}</td>
-            <td style="color:${wr>=50?'#22c55e':'#ef4444'};">${wr}%</td></tr>`;
+        return `<tr>
+    <td style="color:#555;">${i+1}</td>
+    <td style="font-weight:700;">${p.username || '<span style="color:#555;font-style:italic;">غير معروف</span>'}</td>
+    <td><span class="badge badge-active">${p.rank || 'Bronze'}</span></td>
+    <td style="font-family:'Orbitron',sans-serif;color:#00f2ff;font-size:12px;">${p.rankPoints || 0}</td>
+    <td>${total}</td>
+    <td style="color:${wr >= 50 ? '#22c55e' : '#ef4444'};">${wr}%</td>
+</tr>`;
     }).join('');
 }
 
@@ -1044,7 +1067,7 @@ function renderBans() {
         </tr>`).join('');
 }
 
-indow.banPlayer = async () => {
+window.banPlayer = async () => {
     const username = document.getElementById('ban-username').value.trim();
     const reason   = document.getElementById('ban-reason').value.trim();
     const duration = parseInt(document.getElementById('ban-duration').value);

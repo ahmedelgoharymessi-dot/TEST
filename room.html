@@ -398,8 +398,6 @@ const firebaseConfig = {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
-        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
-
         let firebase_auth_user = null;
         let _roomInitialized = false;
 

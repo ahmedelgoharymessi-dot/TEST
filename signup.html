@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="mobile.css">
     <script src="sound-system.js" defer></script>
     <script src="qr-notifications.js" defer></script>
@@ -537,7 +538,16 @@
             measurementId: "G-N4K79FP56N"
         };
         
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
         firebase.initializeApp(firebaseConfig);
+        window._firebaseFns = {
+        ref:             (db, path) => firebase.database().ref(path),
+        get:             (r)        => r.once('value'),
+        update:          (r, v)     => r.update(v),
+        onValue:         (r, cb)    => { r.on('value', s => cb(s)); return () => r.off('value'); },
+        push:            (r, v)     => r.push(v),
+        serverTimestamp: ()         => firebase.database.ServerValue.TIMESTAMP,
+    };
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -561,68 +571,65 @@
             btn.innerHTML = '<span style="position: relative; z-index: 1;">جاري المعالجة...</span>';
             btn.disabled = true;
 
-            // ── STEP 1: Create Auth user ──────────────────────────────────────
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    // ✅ Keep reference to the user object BEFORE the chain continues
                     const user = userCredential.user;
 
-                    // Update Firebase Auth display name, then return user
                     return user.updateProfile({ displayName: usernameValue }).then(() => user);
                 })
-                .then(async (user) => {
-                    // ── STEP 2: Save full player record to Realtime Database ──
-                    try {
-                        const { getDatabase, ref, set } =
-                            await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js");
+                then(async (user) => {
+    try {
+        const db  = firebase.database();
+        const ref = db.ref("players/" + user.uid);
 
-                        const db = getDatabase();
+        await ref.set({
+            username:    usernameValue,
+            email:       user.email,
+            coins:       100,
+            hints:       3,
+            rankPoints:  0,
+            rank:        "Bronze",
+            activeTheme: "cyan",
+            activeTitle: "rookie",
+            inventory: {
+                themes: ["cyan"],
+                titles: ["rookie"]
+            },
+            stats: {
+                totalGames:        0,
+                spyWins:           0,
+                innocentWins:      0,
+                currentStreak:     0,
+                longestWinStreak:  0
+            },
+            moderationWarnings: 0,
+            totalBans:          0,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
 
-                        // ✅ Use 'user.uid'  (from the resolved promise parameter)
-                        // ✅ Use 'usernameValue' (defined in outer scope)
-                        await set(ref(db, "players/" + user.uid), {
-                            username:    usernameValue,          // ← FIXED (was undefined 'finalUsername')
-                            email:       user.email,
-                            coins:       100,
-                            hints:       3,
-                            rankPoints:  0,
-                            rank:        "Bronze",
-                            activeTheme: "cyan",
-                            activeTitle: "rookie",
-                            inventory: {
-                                themes: ["cyan"],
-                                titles: ["rookie"]
-                            },
-                            stats: {
-                                totalGames:        0,
-                                spyWins:           0,
-                                innocentWins:      0,
-                                currentStreak:     0,
-                                longestWinStreak:  0
-                            },
-                            moderationWarnings: 0,
-                            totalBans:          0,
-                            createdAt: Date.now()
-                        });
+        console.log('[signup] ✅ Player record saved for uid:', user.uid, '| username:', usernameValue);
 
-                        console.log('[signup] Player record created for uid:', user.uid);
-                    } catch (dbErr) {
-                        // Non-fatal: auth succeeded, only DB write failed
-                        console.error('[signup] DB write error:', dbErr);
-                    }
-                    
-                    await MOD.init(db, user);
+    } catch (dbErr) {
+        console.error('[signup] DB write error:', dbErr);
+    }
 
-                    // ── STEP 3: Redirect ──────────────────────────────────────
-                    localStorage.setItem('eljasus_user_name', usernameValue);
-                    localStorage.setItem('eljasus_welcome', '1');
+    if (window.MOD) {
+        const compatDb = firebase.database();
+        await MOD.init(compatDb, user);
+        if (document.getElementById('_ej_ban')) return; // Banned — stop
+    }
 
-                    alert('تم إنشاء الحساب! مرحباً، ' + usernameValue);
-                    alert('سيتم تحويلك إلى الصفحة الرئيسية الآن');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 3000);
-                })
+    localStorage.setItem('eljasus_user_name', usernameValue);
+    localStorage.setItem('eljasus_welcome', '1');
+    
+    setTimeout(async () => {
+        await UIAlert('🎉 تم إنشاء الحساب! مرحباً، ' + usernameValue);
+    }, 3000);
+    UIAlert('سيتم تحويلك إلى الصفحة الرئيسي...');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 5000);
+})
                 .catch((error) => {
                     console.error('Signup Error:', error);
                     

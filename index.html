@@ -1060,11 +1060,13 @@
                     📋 القائمة
                 </label>
                 <select id="gameCat" class="w-full p-4 rounded-xl border-2 outline-none text-sm appearance-none cursor-pointer font-bold">
+                    <!-- Built-in categories (always present) -->
                     <option value="places">🌍 أماكن سياحية</option>
                     <option value="food">🍕 أكلات مصرية</option>
                     <option value="jobs">🛠️ مهن ووظائف</option>
                     <option value="companies">🏢 شركات عالمية</option>
                     <option value="football_teams">⚽ أندية ومنتخبات كورة</option>
+                    <!-- Admin-added categories will be injected here dynamically -->
                 </select>
             </div>
 
@@ -1303,20 +1305,17 @@
         const auth = getAuth(app);
         const db   = getDatabase(app);
 
-        // ── Set _firebaseFns ONCE here — before any auth callback ────
         window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
-        // ── MODERATION INIT ──────────────────────────────────────────
-        // FIX: use auth.currentUser in buttons instead of this variable
-        // to avoid the race condition where auth resolves after the click.
         onAuthStateChanged(auth, async (user) => {
-            // Re-set in case moderation.js reads it before this fires
-            window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
+            currentUser = user;
 
             if (window.MOD) {
                 await MOD.init(db, user);
                 if (document.getElementById('_ej_ban')) return;
             }
+
+            await loadCustomCategories();
         });
 
         // ── GAME DATA ────────────────────────────────────────────────
@@ -1380,6 +1379,52 @@
         };
 
         let myName = "", myRoom = "", isHost = false;
+
+        async function loadCustomCategories() {
+        try {
+            const snap = await get(ref(db, 'wordLists'));
+            if (!snap.exists()) return;
+
+            const select = document.getElementById('gameCat');
+
+            // Remove any previously injected custom options
+            // (in case this is called again on auth change)
+            select.querySelectorAll('option[data-custom]').forEach(o => o.remove());
+
+            snap.forEach(child => {
+                const catId  = child.key;
+                const catVal = child.val();
+
+                // Skip if it's a built-in category key (already in HTML)
+                const builtIn = ['places','food','jobs','companies','football_teams'];
+                if (builtIn.includes(catId)) {
+                    // If admin updated a built-in category's word list, merge the words
+                    if (Array.isArray(catVal.words) && catVal.words.length > 0) {
+                        gameData[catId] = [...(gameData[catId] || []), ...catVal.words];
+                    }
+                    return;
+                }
+
+                // It's a NEW custom category from admin
+                if (!catVal.words || catVal.words.length === 0) return; // skip empty
+
+                // Add to gameData so startLocalGame can find it
+                gameData[catId] = Array.isArray(catVal.words) ? catVal.words : Object.values(catVal.words);
+
+                // Add to the <select> dropdown
+                const emoji  = catVal.emoji || '🗂️';
+                const label  = catVal.name  || catId;
+                const option = document.createElement('option');
+                option.value           = catId;
+                option.textContent     = `${emoji} ${label}`;
+                option.dataset.custom  = 'true'; // mark so we can remove/re-add on refresh
+                select.appendChild(option);
+            });
+
+        } catch (e) {
+            console.warn('loadCustomCategories failed:', e);
+        }
+    }
 
         // Auto-fill name from localStorage
         document.addEventListener('DOMContentLoaded', () => {
