@@ -1,18 +1,8 @@
 // ============================================================
 // EL JASUS — MODERATION SYSTEM v3  (complete rewrite)
 // Yellow Card / Red Card — Warn → Ban → Full Lockout
-//
-// USAGE (same page as Firebase init):
-//
-//   <script src="moderation.js"></script>
-//   <script type="module">
-//     import { getDatabase, ... } from "firebase...";
-//     ...
-//     onAuthStateChanged(auth, user => {
-//       if (user) MOD.init(db, user);
-//     });
-//   </script>
-//
+// Uses Firebase Realtime Database for ban state and synchronization.
+// Features:
 //   To scan a chat message before sending:
 //     const blocked = await MOD.scan(messageText);
 //     if (blocked) return;   // don't send, warning/ban handled internally
@@ -28,31 +18,67 @@
 // كِلٌبً  ==  كلب,  and  klab  ==  klab, etc.
 // ══════════════════════════════════════════════════════════
 const BLOCKED = [
-    // ── Arabic profanity ──────────────────────────────────
+    // ── Arabic profanity (Direct & Regional) ──────────────────────────────────
     'كس','كوس','بص','بصص','زبر','أير','اير','زب','لحس',
-    'فشخ','فشخك','يفشخ','تفشيخ',
-    'نيك','ينيك','انيك','تنيك','مناك','منيوك',
-    'شرموط','شرموطة','عرص','عرصة','خول','خولة',
-    'قواد','قحبة','قحب','متناك','منيوكة',
-    'وسخ','حقير','كلب','ابن كلب','ابن متناكة',
+    'فشخ','فشخك','يفشخ','تفشيخ','طيز','مكوة','خرق','سوءة',
+    'نيك','ينيك','انيك','تنيك','مناك','منيوك','تناك',
+    'شرموط','شرموطة','شرموته','عرص','عرصة','معرص','خول','خولة',
+    'قواد','قحبة','قحب','متناك','منيوكة','تناكة','عاهرة','مومس',
+    'وسخ','حقير','كلب','ابن كلب','ابن متناكة','ابن القحبة','ابن الشرموطة',
     'يلعن','العن','لعنة','ملعون','تبا','جحش','خنزير','حمار',
-    'غبي','غبية','أهبل','عبيط','بهيمة','حيوان','زبالة','زبل',
+    'غبي','غبية','أهبل','عبيط','بهيمة','حيوان','زبالة','زبل','زق','خرا','خري',
     'نعل','أبوك','أمك','أختك','ابن الـ','يبن الـ','يعرص','تعرص',
-    'لواط','لوطي','شاذ','منحرف',
+    'لواط','لوطي','شاذ','منحرف','مخنث','ديوث','زامل','عطاي','طحان','لبوة',
+    'كسختك','كسمك','كسامك','مكوتك','طيزك','بزاز','حلمة',
+
+    // ── Arabic obfuscated / bypass attempts ────────────────────────────
+    'ك.س', 'خ.ول', 'ز.ب', 'ق.ح.ب.ة', 'ش.ر.م.و.ط', 'م.ت.ن.ا.ك', 'ع.ر.ص',
+    'ك_س', 'خ_ول', 'ز_ب', 'ك س', 'خ ول', 'ز ب', 'ق ح ب ة', 'ش ر م و ط',
+    'ك..س', 'ك/س', 'ك-س', 'ك~س',
+    'ك1س', 'ك0س', 'كوسمك', 'كـس', 'ز.ب.ر', 'ا.ي.ر', 'ن.ي.ك',
+    
     // ── Hate / discriminatory ────────────────────────────
-    'عبد','زنجي','متخلف',
-    // ── Threats ──────────────────────────────────────────
-    'اقتلك','اقتله','اذبحك','اذبحه','سأقتلك','هاجمك','ارهابي',
+    'عبد','زنجي','متخلف','عنصري','بربري','همجي',
+
+    // ── Threats & Violence ──────────────────────────────────────────
+    'اقتلك','اقتله','اذبحك','اذبحه','سأقتلك','هاجمك','ارهابي','تفجير','اغتيال','ادعسك','امسحك',
+
     // ── English profanity ────────────────────────────────
-    'fuck','fucking','fucker','fck','f*ck',
-    'shit','sh*t','bitch','bitches',
-    'ass','asshole','bastard','cunt','cock','dick','pussy',
-    'whore','slut','nigger','nigga','faggot','retard',
+    'fuck','fucking','fucker','fck','f*ck','f u c k','f.u.c.k',
+    'motherfucker','mofo','cocksucker',
+    'shit','sh*t','sh1t','bullshit','horseshit',
+    'bitch','bitches','b!tch','b1tch','b i t c h',
+    'ass','asshole','assholes','a$$','a$$hole',
+    'bastard','cunt','cock','dick','pussy','penis','vagina','twat',
+    'whore','slut','skank','nigger','nigga','n1gga','n!gga','faggot','fag','retard',
+    'wanker','prick','douche','douchebag','dipshit','dumbass','jackass','pedo','pedophile',
+
     // ── English threats ──────────────────────────────────
-    'kill you','rape','murder',
-    // ── Transliterated bypass attempts ───────────────────
-    'kosomak','ksomak','ksmk','metnak','metnaka',
+    'kill you','rape','murder','beat you','cut your', 'strangle',
+
+    // ── Transliterated bypass attempts (Franco-Arabic) ───────────────────
+    'kosomak','ksomak','ksmk','metnak','metnaka','sharmota','sharmouta','mnyok',
+    'mnywk','a7a','aha','khawal','khwal','ars','3ars','mo3ars','mzabber',
+    'zeby','zebby','tezy','teezy','qahba','kahba','kahba',
 ];
+
+// دالة لتنظيف النص من الرموز والمسافات قبل فحصه
+function cleanText(text) {
+    // إزالة المسافات، النقاط، الشرطات، والرموز الخاصة
+    return text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~() ]/g, "").toLowerCase();
+}
+
+function containsProfanity(userInput) {
+    const cleanedInput = cleanText(userInput);
+    for (let word of BLOCKED) {
+        // فحص الكلمة الممنوعة بدون الرموز
+        const cleanedWord = cleanText(word);
+        if (cleanedInput.includes(cleanedWord)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // Patterns: same char ×7 or more = spam
 const SPAM_PATTERN = /(.)\1{6,}/;

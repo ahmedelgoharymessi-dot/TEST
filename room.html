@@ -13,7 +13,6 @@
     <script src="emoji-reactions.js" defer></script>
     <script src="voice-chat.js" defer></script>
     <script src="screenshot.js" defer></script>
-    <script src="moderation.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="ElJasus2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -21,8 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="dialogs.js"></script>
-    <script src="moderation.js"></script>
-
+    <script src="moderation.js"></script><!-- loaded ONCE here, not again below -->
 
     <style>
         :root { 
@@ -33,7 +31,6 @@
             --accent-color: #00f2ff;
             --secondary-color: #7c30ff;
         }
-        
         body { 
             font-family: 'Cairo', sans-serif; 
             background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 50%, #0f0c1d 100%);
@@ -43,14 +40,11 @@
             position: relative;
             overflow-x: hidden;
         }
-
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background-image: 
                 linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
@@ -59,124 +53,68 @@
             pointer-events: none;
             z-index: 0;
         }
-
         @keyframes gridMove {
             0% { transform: translateY(0); }
             100% { transform: translateY(50px); }
         }
-        
         .glass { 
             background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
             backdrop-filter: blur(20px);
             border: 2px solid;
             border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 30px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1), 0 0 30px rgba(0,242,255,.1);
             position: relative;
             overflow: hidden;
         }
-
         .glass::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(0, 242, 255, 0.05),
-                transparent
-            );
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0,242,255,.05), transparent);
             animation: shimmer 3s infinite;
             pointer-events: none;
         }
-
         @keyframes shimmer {
             0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
-        
-        .dynamic-text-primary { 
-            color: var(--accent-color);
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-            font-family: 'Orbitron', sans-serif;
-        }
-        
-        .dynamic-bg-primary { 
-            background: linear-gradient(135deg, var(--btn-color), var(--secondary-color));
-            color: #ffffff;
-            box-shadow: 
-                0 4px 15px rgba(0, 242, 255, 0.4),
-                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn-main { 
-            background: linear-gradient(135deg, var(--btn-color), var(--secondary-color));
-            color: #ffffff;
-            font-weight: 900;
-            border: 2px solid rgba(0, 242, 255, 0.5);
-            box-shadow: 
-                0 0 20px rgba(0, 242, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-main:hover { 
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 
-                0 0 30px rgba(0, 242, 255, 0.6),
-                0 8px 20px rgba(0, 242, 255, 0.3);
-        }
-
-        .reveal-innocent {
-            background: linear-gradient(145deg, #065f46, #059669) !important;
-            border-color: #34d399 !important;
-            box-shadow: 0 0 40px rgba(52, 211, 153, 0.5);
-            animation: flipInY 0.6s;
-        }
-
-        .reveal-spy {
-            background: linear-gradient(145deg, #7f1d1d, #dc2626) !important;
-            border-color: #f87171 !important;
-            box-shadow: 0 0 40px rgba(248, 113, 113, 0.5);
-            animation: shakeX 0.5s;
-        }
-
-        /* ── Scrollbar styles ─────────────────────────────────────────────── */
-        /* Page-level scrollbar (browser default, left side in RTL) — untouched */
-
-        /* Players list internal scrollbar — styled, slightly wider */
+        .dynamic-text-primary { color: var(--accent-color); text-shadow: 0 0 10px rgba(0,242,255,.5); font-family: 'Orbitron', sans-serif; }
+        .dynamic-bg-primary { background: linear-gradient(135deg, var(--btn-color), var(--secondary-color)); color: #fff; box-shadow: 0 4px 15px rgba(0,242,255,.4), inset 0 -2px 10px rgba(0,0,0,.3); }
+        .btn-main { background: linear-gradient(135deg, var(--btn-color), var(--secondary-color)); color: #fff; font-weight: 900; border: 2px solid rgba(0,242,255,.5); box-shadow: 0 0 20px rgba(0,242,255,.4), inset 0 1px 0 rgba(255,255,255,.2); transition: all .3s ease; }
+        .btn-main:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 30px rgba(0,242,255,.6), 0 8px 20px rgba(0,242,255,.3); }
+        .reveal-innocent { background: linear-gradient(145deg, #065f46, #059669) !important; border-color: #34d399 !important; box-shadow: 0 0 40px rgba(52,211,153,.5); animation: flipInY 0.6s; }
+        .reveal-spy { background: linear-gradient(145deg, #7f1d1d, #dc2626) !important; border-color: #f87171 !important; box-shadow: 0 0 40px rgba(248,113,113,.5); animation: shakeX 0.5s; }
         .custom-scrollbar::-webkit-scrollbar { width: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-track { 
-            background: rgba(0, 242, 255, 0.05);
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background: linear-gradient(180deg, var(--accent-color), var(--secondary-color));
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #33f5ff, #9b59ff);
-        }
-        /* Firefox */
-        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--accent-color) rgba(0,242,255,0.05); }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,242,255,.05); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-color), var(--secondary-color)); border-radius: 10px; }
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--accent-color) rgba(0,242,255,.05); }
+        .fa-crown { color: #ffd700; filter: drop-shadow(0 0 8px rgba(255,215,0,.8)); }
+        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(0,242,255,.8), 0 0 20px rgba(0,242,255,.6); }
 
-        .fa-crown {
-            color: #ffd700;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+        /* ── Name Tag / Theme chip ────────────────────── */
+        .player-nametag {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .04em;
+            padding: 2px 7px;
+            border-radius: 5px;
+            background: rgba(0,242,255,.1);
+            border: 1px solid rgba(0,242,255,.25);
+            color: #00f2ff;
+            margin-left: 4px;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .player-rank-badge {
+            font-size: 14px;
+            line-height: 1;
+            flex-shrink: 0;
         }
 
-        .neon-text {
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 
-                0 0 10px rgba(0, 242, 255, 0.8),
-                0 0 20px rgba(0, 242, 255, 0.6);
-        }
+        /* ── Toast ─────────────────────────────────────── */
+        @keyframes _toast_in { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
     </style>
 </head>
 <body class="p-4">
@@ -185,8 +123,10 @@
     <div id="game-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="max-w-md w-full">
             <div class="text-center mb-6">
-                <p class="text-[11px] dynamic-text-primary font-black uppercase tracking-widest mb-2" style="font-family: 'Orbitron', sans-serif;">دور اللاعب</p>
-                <h3 id="targetPlayer" class="text-4xl font-black neon-text">---</h3>
+                <p class="text-[11px] dynamic-text-primary font-black uppercase tracking-widest mb-2" style="font-family:'Orbitron',sans-serif;">دور اللاعب</p>
+                <div id="targetPlayerWrap" class="flex items-center justify-center gap-2 flex-wrap">
+                    <h3 id="targetPlayer" class="text-4xl font-black neon-text">---</h3>
+                </div>
             </div>
             <div id="secretCard" class="h-96 glass rounded-[2.5rem] border-2 border-dashed border-cyan-500/50 flex flex-col items-center justify-center cursor-pointer shadow-2xl transition-all">
                 <i class="fas fa-fingerprint text-7xl mb-4 opacity-20"></i>
@@ -209,16 +149,12 @@
             <div id="chatWindow" class="hidden fixed top-20 left-6 z-[60] w-80 glass rounded-2xl p-4 border-2 border-cyan-500/30 shadow-2xl animate__animated animate__slideInLeft">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-black text-cyan-400 neon-text">💬 الشات</h3>
-                    <button id="closeChatBtn" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button id="closeChatBtn" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
                 </div>
                 <div id="discussionMessages" class="h-64 overflow-y-auto custom-scrollbar mb-3 text-right text-xs bg-black/40 p-3 rounded-xl border border-white/10"></div>
                 <div class="flex gap-2">
                     <input id="discussionInput" type="text" class="flex-1 bg-black/40 border border-white/10 p-2 rounded-lg text-xs outline-none focus:border-cyan-500" placeholder="اكتب رسالتك...">
-                    <button id="sendDiscussionBtn" class="dynamic-bg-primary px-4 rounded-lg text-xs font-black">
-                        إرسال
-                    </button>
+                    <button id="sendDiscussionBtn" class="dynamic-bg-primary px-4 rounded-lg text-xs font-black">إرسال</button>
                 </div>
             </div>
 
@@ -233,24 +169,25 @@
             <p id="discussionInfo" class="text-[10px] opacity-60 mt-2 text-center font-bold">
                 سيتم الانتقال للتصويت عندما يضغط جميع اللاعبين على زر الانتقال.
             </p>
-                <!-- HINT SYSTEM -->
-                <div id="hint-section" class="mt-3 flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,215,0,.08);border:2px solid rgba(255,215,0,.2);">
-                    <div class="flex items-center gap-2">
-                        <span style="font-size:20px;">💡</span>
-                        <div>
-                            <p class="text-xs font-bold text-yellow-400">تلميح للأبرياء</p>
-                            <p class="text-xs text-gray-400">رصيدك: <span id="hintBalance" class="text-yellow-400 font-bold">0</span> تلميح</p>
-                        </div>
+
+            <!-- HINT SYSTEM -->
+            <div id="hint-section" class="mt-3 flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,215,0,.08);border:2px solid rgba(255,215,0,.2);">
+                <div class="flex items-center gap-2">
+                    <span style="font-size:20px;">💡</span>
+                    <div>
+                        <p class="text-xs font-bold text-yellow-400">تلميح للأبرياء</p>
+                        <p class="text-xs text-gray-400">رصيدك: <span id="hintBalance" class="text-yellow-400 font-bold">0</span> تلميح</p>
                     </div>
-                    <button id="useHintBtn" onclick="useHint()" class="px-4 py-2 rounded-xl font-black text-xs uppercase transition-all"
-                        style="background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,165,0,.2));border:2px solid rgba(255,215,0,.5);color:#ffd700;">
-                        استخدم تلميحاً
-                    </button>
                 </div>
-                <div id="hint-display" class="hidden mt-2 p-3 rounded-xl text-center" style="background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);">
-                    <p class="text-xs text-gray-400 mb-1">💡 التلميح</p>
-                    <p id="hint-text" class="font-black text-yellow-400"></p>
-                </div>
+                <button id="useHintBtn" onclick="useHint()" class="px-4 py-2 rounded-xl font-black text-xs uppercase transition-all"
+                    style="background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,165,0,.2));border:2px solid rgba(255,215,0,.5);color:#ffd700;">
+                    استخدم تلميحاً
+                </button>
+            </div>
+            <div id="hint-display" class="hidden mt-2 p-3 rounded-xl text-center" style="background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);">
+                <p class="text-xs text-gray-400 mb-1">💡 التلميح</p>
+                <p id="hint-text" class="font-black text-yellow-400"></p>
+            </div>
         </div>
     </div>
 
@@ -259,18 +196,14 @@
         <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative">
             <h2 class="text-2xl font-black mb-4 text-center neon-text">التصويت 🕵️‍♂️</h2>
             <p class="text-sm opacity-70 mb-4 text-center font-bold">اختر اللاعب الذي تشك أنه الجاسوس</p>
-            
             <div id="voteCards" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6"></div>
-            
             <p id="votingStatus" class="text-xs opacity-60 mt-4 text-center font-bold"></p>
         </div>
     </div>
 
     <!-- Tie Screen -->
     <div id="tie-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate__animated animate__fadeIn">
-        <h1 class="text-8xl font-black text-yellow-500 animate__animated animate__bounceIn" style="text-shadow: 0 0 30px rgba(234, 179, 8, 0.8); font-family: 'Orbitron', sans-serif;">
-            تعادل! 🤝
-        </h1>
+        <h1 class="text-8xl font-black text-yellow-500 animate__animated animate__bounceIn" style="text-shadow:0 0 30px rgba(234,179,8,.8);font-family:'Orbitron',sans-serif;">تعادل! 🤝</h1>
     </div>
 
     <!-- Spinner Screen -->
@@ -278,27 +211,20 @@
         <div class="glass w-full max-w-md rounded-[2.5rem] p-6 border border-white/10 shadow-2xl text-center">
             <h2 class="text-2xl font-black mb-4 neon-text">اختيار عشوائي 🎯</h2>
             <p class="text-sm opacity-70 mb-4">حدث تعادل، سيتم اختيار لاعب عشوائي</p>
-            
-            <div id="spinnerWheel" class="relative w-64 h-64 mx-auto mb-6 bg-gradient-to-br from-purple-900 to-pink-900 rounded-full border-4 border-yellow-500 flex items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.5)]">
-                <div id="spinnerPointer" class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-0 h-0 border-l-8 border-r-8 border-t-16 border-transparent border-t-yellow-500 z-10"></div>
+            <div id="spinnerWheel" class="relative w-64 h-64 mx-auto mb-6 bg-gradient-to-br from-purple-900 to-pink-900 rounded-full border-4 border-yellow-500 flex items-center justify-center shadow-[0_0_50px_rgba(234,179,8,.5)]">
                 <div id="spinnerContent" class="text-3xl font-black text-white"></div>
             </div>
-            
-            <button id="startSpinnerBtn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all border-2 border-yellow-400/50">
-                ابدأ السحب 🎰
-            </button>
+            <button id="startSpinnerBtn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all border-2 border-yellow-400/50">ابدأ السحب 🎰</button>
         </div>
     </div>
 
     <!-- Spy Guess Screen -->
     <div id="spy-guess-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
         <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-red-500/30 shadow-2xl text-center max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-black mb-2 text-red-500 neon-text" style="text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);">🕵️ الجاسوس المكشوف</h2>
+            <h2 class="text-2xl font-black mb-2 text-red-500 neon-text" style="text-shadow:0 0 15px rgba(239,68,68,.8);">🕵️ الجاسوس المكشوف</h2>
             <p id="spyNameDisplay" class="text-xl mb-4 font-bold"></p>
             <p class="text-sm opacity-70 mb-4">اختر الكلمة الصحيحة من القائمة</p>
-            
             <div id="categoryWordsList" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-h-96 overflow-y-auto custom-scrollbar"></div>
-            
             <p id="guessResult" class="text-lg font-black mt-4"></p>
         </div>
     </div>
@@ -308,43 +234,43 @@
         <div class="glass w-full max-w-lg rounded-[2.5rem] p-8 border border-white/10 shadow-2xl text-center">
             <div id="resultIcon" class="text-8xl mb-4"></div>
             <h2 id="resultTitle" class="text-3xl font-black mb-2 neon-text"></h2>
-            <p id="resultMessage" class="text-lg mb-6 font-bold"></p>
+            <p id="resultMessage" class="text-lg mb-4 font-bold"></p>
+            <!-- Result player summary -->
+            <div id="resultPlayerList" class="grid grid-cols-2 gap-2 mb-6 text-left max-h-48 overflow-y-auto custom-scrollbar"></div>
             <button id="returnToRoomBtn" class="w-full dynamic-bg-primary py-4 rounded-2xl font-black shadow-xl uppercase tracking-wider">
                 العودة للغرفة 🏠
             </button>
         </div>
     </div>
 
-    <!-- Room Overlay -->
+    <!-- Room Overlay (Waiting Room) -->
     <div id="room-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
         <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative overflow-y-auto" style="max-height:92dvh;">
             
-            <!-- Back to Home -->
             <a href="index.html" class="absolute top-4 left-4 text-gray-400 hover:text-cyan-400 transition-colors">
                 <i class="fas fa-arrow-right text-xl"></i>
             </a>
 
             <div class="flex justify-between items-start mb-6 mt-8">
                 <div>
-                    <h2 class="text-3xl font-black neon-text cursor-pointer" id="roomCodeContainer" title="اضغط للنسخ" style="font-family: 'Orbitron', sans-serif;">
-                        <span id="displayRoomCode">----</span> 
+                    <h2 class="text-3xl font-black neon-text cursor-pointer" id="roomCodeContainer" title="اضغط للنسخ" style="font-family:'Orbitron',sans-serif;">
+                        <span id="displayRoomCode">----</span>
                         <i class="fas fa-copy text-sm opacity-30 hover:opacity-100 transition-opacity"></i>
                     </h2>
-                    <p class="text-[9px] opacity-50 uppercase font-bold tracking-widest" style="font-family: 'Orbitron', sans-serif;">كود الغرفة</p>
+                    <p class="text-[9px] opacity-50 uppercase font-bold tracking-widest" style="font-family:'Orbitron',sans-serif;">كود الغرفة</p>
                 </div>
-                <button id="leaveRoomBtn" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs px-4 py-2 rounded-xl font-bold border-2 border-red-500/30 transition-all">
-                    مغادرة
-                </button>
+                <button id="leaveRoomBtn" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs px-4 py-2 rounded-xl font-bold border-2 border-red-500/30 transition-all">مغادرة</button>
             </div>
 
             <div id="host-controls" class="hidden space-y-3 mb-6 glass p-4 rounded-2xl border border-white/5">
-                <label class="text-[10px] font-bold opacity-40 uppercase tracking-wider" style="font-family: 'Orbitron', sans-serif;">إعدادات المضيف</label>
+                <label class="text-[10px] font-bold opacity-40 uppercase tracking-wider" style="font-family:'Orbitron',sans-serif;">إعدادات المضيف</label>
                 <select id="updateCat" onchange="updateRoomSettings()" class="w-full bg-black/60 text-sm p-3 rounded-xl border-2 border-cyan-500/20 outline-none focus:border-cyan-500 font-bold">
                     <option value="places">🌍 أماكن سياحية</option>
                     <option value="food">🍕 أكلات مصرية</option>
                     <option value="jobs">🛠️ مهن ووظائف</option>
                     <option value="companies">🏢 شركات عالمية</option>
                     <option value="football_teams">⚽ أندية ومنتخبات كورة</option>
+                    <!-- custom categories injected here by loadCustomCategories() -->
                 </select>
                 <div class="flex items-center justify-between bg-black/40 p-3 rounded-xl mb-3 border-2 border-cyan-500/20">
                     <span class="text-xs font-bold">نوع الغرفة:</span>
@@ -354,73 +280,48 @@
 
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="text-[11px] font-bold opacity-50 uppercase tracking-widest" style="font-family: 'Orbitron', sans-serif;">اللاعبون المتصلون</label>
-                    <span id="pCount" class="text-[11px] font-black dynamic-text-primary" style="font-family: 'Orbitron', sans-serif;">0/10</span>
+                    <label class="text-[11px] font-bold opacity-50 uppercase tracking-widest" style="font-family:'Orbitron',sans-serif;">اللاعبون المتصلون</label>
+                    <span id="pCount" class="text-[11px] font-black dynamic-text-primary" style="font-family:'Orbitron',sans-serif;">0/10</span>
                 </div>
-
-                <!-- ✅ FIX: Players list now has its own fixed-height scroll box.
-                     The card/page scrollbar is untouched and still works for scrolling
-                     the rest of the room overlay (settings, buttons, etc.). -->
-                <div id="roomPlayersList"
-                     class="space-y-2 custom-scrollbar"
-                     style="max-height: 260px; overflow-y: auto; padding-right: 8px;">
-                </div>
+                <div id="roomPlayersList" class="space-y-2 custom-scrollbar" style="max-height:260px;overflow-y:auto;padding-right:8px;"></div>
             </div>
 
-            <button id="hostStartBtn" class="hidden w-full btn-main py-4 rounded-2xl font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider">
-                ابدأ اللعب 🚀
-            </button>
-            <div id="guestWaitMsg" class="hidden text-center py-2 opacity-40 animate-pulse text-sm font-bold">
-                في انتظار المضيف...
-            </div>
-            <div id="minPlayersMsg" class="hidden text-center text-xs text-yellow-500 mt-2 font-bold">
-                يجب توفر 3 لاعبين على الأقل
-            </div>
+            <button id="hostStartBtn" class="hidden w-full btn-main py-4 rounded-2xl font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider">ابدأ اللعب 🚀</button>
+            <div id="guestWaitMsg" class="hidden text-center py-2 opacity-40 animate-pulse text-sm font-bold">في انتظار المضيف...</div>
+            <div id="minPlayersMsg" class="hidden text-center text-xs text-yellow-500 mt-2 font-bold">يجب توفر 3 لاعبين على الأقل</div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { initializeApp }   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect, push, serverTimestamp, onChildAdded }
+            from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        
-const firebaseConfig = {
-  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-  authDomain: "el-jasus.firebaseapp.com",
-  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "el-jasus",
-  storageBucket: "el-jasus.firebasestorage.app",
-  messagingSenderId: "415659587906",
-  appId: "1:415659587906:web:782f7940176ea4097eb0db",
-  measurementId: "G-N4K79FP56N"
-};
-        const app = initializeApp(firebaseConfig);
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain:        "el-jasus.firebaseapp.com",
+            databaseURL:       "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId:         "el-jasus",
+            storageBucket:     "el-jasus.firebasestorage.app",
+            messagingSenderId: "415659587906",
+            appId:             "1:415659587906:web:782f7940176ea4097eb0db",
+            measurementId:     "G-N4K79FP56N"
+        };
+
+        const app  = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app);
+        const db   = getDatabase(app);
+
         let firebase_auth_user = null;
-        let _roomInitialized = false;
+        let _roomInitialized   = false;
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'login.html'; return; }
+        // ── Expose Firebase helpers for moderation + voice chat ─────────────────
+        window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp, onChildAdded };
 
-            // ── MODERATION: single correct init ──────────────────
-            window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
-            if (window.MOD) {
-                await MOD.init(db, user);
-                // If banned → ban screen covers everything, stop here
-                if (document.getElementById('_ej_ban')) return;
-            }
-            // ─────────────────────────────────────────────────────
-
-            firebase_auth_user = user;
-
-            if (!_roomInitialized) {
-                _roomInitialized = true;
-                joinPendingAndInit();
-            }
-        });
-
+        // ══════════════════════════════════════════════════════════════════════
+        // GAME DATA — built-in categories (custom ones merged in at runtime)
+        // ══════════════════════════════════════════════════════════════════════
         const gameData = {
             places: [
                 "المدرسة", "المستشفى", "حديقة الحيوان", "المطار", "النادي", "السينما", "المطعم", "البحر", "المزرعة", "السيرك",
@@ -447,7 +348,7 @@ const firebaseConfig = {
                 "فتة كوارع", "كفتة مشوية", "طرب", "كباب", "كبدة إسكندراني", "سجق شرقي", "مكرونة بشاميل", "رقاق باللحمة", "جلاش", "أرز بلبن",
                 "أم علي", "بسبوسة", "كنافة", "لقيمات (قاضي)", "فطير مشلتت", "مش وجبنة قديمة", "عسل أسود وطحينة", "كشك", "بصارة", "عدس",
                 "شوربة لسان عصفور", "أرز معمر", "مسقعة", "تورلي خضار", "بامية باللحمة", "قلقاس", "سبانخ", "أرز بالشعرية", "فراخ محمرة", "حمام محشي",
-                "بط", "أرانب", "سمك بلطي", "سمك بوري", "جمبري", "سبيط", "فسيخ", "رنجة", "ملوحة", "بطاطس محمرة","بابا غنوج", "سلطة خضراء", "مخلل (طرشي)",
+                "بط", "أرانب", "سمك بلطي", "سمك بوري", "جمبري", "سبيط", "فسيخ", "رنجة", "ملوحة", "بطاطس محمرة", "بابا غنوج", "سلطة خضراء", "مخلل (طرشي)",
                 "باذنجان مخلل", "بيض بالبسطرمة", "شكشوكة", "عجة", "مخ بانيه", "كبدة وقوانص", "كفتة",
                 "كفتة أرز", "أرز صيادية", "كيكة برتقال", "رز بلبن", "مهلبية", "قمر الدين", "عاشورا", "زلابيا", "بلح الشام", "صوابع زينب",
                 "كحك العيد", "بسكويت نشادر", "غريبة", "بيتيفور", "منين (قراقيش)", "قرص بعجوة", "عيش بلدي", "عيش فينو", "شاورما مصري", "فراخ بانيه",
@@ -473,13 +374,139 @@ const firebaseConfig = {
                 "Nike", "Adidas", "Puma", "Zara", "H&M", "Gucci", "Prada", "Rolex", "Lacoste", "Chanel",
                 "McDonald's", "KFC", "Burger King", "Pizza Hut", "Subway", "Starbucks", "Pepsi", "Coca-Cola", "Red Bull", "KitKat",
                 "Disney", "Marvel", "DC Comics", "Warner Bros", "Paramount", "Pixar", "Universal", "Spotify", "Snapchat", "Telegram",
-                "Visa", "Mastercard", "PayPal", "Binance", "Amazon", "eBay", "Alibaba", "AliExpress", "Shein", "Noon",
+                "Visa", "Mastercard", "PayPal", "Binance", "eBay", "Alibaba", "AliExpress", "Shein", "Noon",
                 "Uber", "Careem", "Airbnb", "Booking", "FedEx", "DHL", "Aramex", "IKEA", "Walmart", "Carrefour",
-                "Nestle", "Dove", "Nivea", "L'Oreal", "Johnson's", "Colgate", "Gillette", "Rolex", "Casio", "Nikon",
+                "Nestle", "Dove", "Nivea", "L'Oreal", "Johnson's", "Colgate", "Gillette", "Casio", "Nikon",
                 "Lego", "Barbie", "Hot Wheels", "PlayStation", "Xbox", "Nintendo", "Zoom", "Skype", "Slack", "LinkedIn"
             ]
         };
 
+        // ══════════════════════════════════════════════════════════════════════
+        // PLAYER PROFILE CACHE — name → { rank, nameTheme, nameTag }
+        // Loaded once at init, used in all game stage renderers
+        // ══════════════════════════════════════════════════════════════════════
+        const playerProfileCache = {};
+
+        const RANK_BADGES = {
+            Bronze:   { icon: '🥉', color: '#cd7f32' },
+            Silver:   { icon: '🥈', color: '#c0c0c0' },
+            Gold:     { icon: '🥇', color: '#ffd700' },
+            Platinum: { icon: '💠', color: '#00e5ff' },
+            Diamond:  { icon: '💎', color: '#b9f2ff' },
+        };
+
+        async function buildPlayerProfileCache(playerNames) {
+            try {
+                const snap = await get(ref(db, 'players'));
+                if (!snap.exists()) return;
+                snap.forEach(child => {
+                    const p     = child.val();
+                    // Players are stored by UID; match by any name field
+                    const pName = p.displayName || p.username || p.name || '';
+                    const cleanName = pName.replace(' (خامل)', '').trim();
+                    if (cleanName && playerNames.some(n => n.replace(' (خامل)', '').trim() === cleanName)) {
+                        playerProfileCache[cleanName] = {
+                            rank:      p.rank      || 'Bronze',
+                            nameTheme: p.nameTheme || null,
+                            nameTag:   p.nameTag   || null,
+                            rankPoints: p.rankPoints || 0,
+                        };
+                    }
+                });
+            } catch(e) { console.warn('[room] profile cache build failed:', e); }
+        }
+
+        /**
+         * getPlayerHTML — returns rich HTML for a player name with rank badge + theme
+         * Used in ALL game stages: waiting room, discussion, voting, spy guess, result
+         */
+        function getPlayerHTML(name, opts = {}) {
+            const { isHost = false, isMe = false, isIdle = false, large = false } = opts;
+            const cleanName = name.replace(' (خامل)', '').trim();
+            const profile   = playerProfileCache[cleanName];
+            const rank      = profile?.rank || 'Bronze';
+            const badge     = RANK_BADGES[rank] || RANK_BADGES.Bronze;
+            const nameStyle = profile?.nameTheme
+                ? `color:${profile.nameTheme};text-shadow:0 0 10px ${profile.nameTheme}66;`
+                : '';
+            const tagHtml = profile?.nameTag
+                ? `<span class="player-nametag">${profile.nameTag}</span>`
+                : '';
+            const nameSize = large ? 'font-size:1.1em;' : '';
+
+            return `
+                <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                    ${tagHtml}
+                    <span style="font-weight:900;${nameSize}${nameStyle}">${cleanName}</span>
+                    <span class="player-rank-badge" title="${rank}">${badge.icon}</span>
+                    ${isHost ? '<i class="fas fa-crown" style="font-size:13px;color:#ffd700;filter:drop-shadow(0 0 6px rgba(255,215,0,.8));"></i>' : ''}
+                    ${isMe   ? '<span style="font-size:10px;color:#00f2ff;font-weight:700;">(أنت)</span>' : ''}
+                    ${isIdle ? '<span style="font-size:10px;color:#666;"> (خامل)</span>' : ''}
+                </div>`;
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        // LOAD CUSTOM CATEGORIES from Firebase wordLists
+        // Merges into gameData + injects options into host dropdown
+        // ══════════════════════════════════════════════════════════════════════
+        async function loadCustomCategories() {
+            try {
+                const snap = await get(ref(db, 'wordLists'));
+                if (!snap.exists()) return;
+                const builtIn = ['places','food','jobs','companies','football_teams'];
+                const select  = document.getElementById('updateCat');
+
+                // Remove previously injected custom options
+                select?.querySelectorAll('option[data-custom]').forEach(o => o.remove());
+
+                snap.forEach(child => {
+                    const catId  = child.key;
+                    const catVal = child.val();
+                    if (!catVal.words) return;
+                    const words = Array.isArray(catVal.words) ? catVal.words : Object.values(catVal.words);
+                    if (!words.length) return;
+
+                    if (builtIn.includes(catId)) {
+                        // Merge extra words into built-in category
+                        const newWords = words.filter(w => !gameData[catId]?.includes(w));
+                        if (newWords.length) gameData[catId] = [...(gameData[catId] || []), ...newWords];
+                    } else {
+                        // Entirely new custom category
+                        gameData[catId] = words;
+                        if (select) {
+                            const opt = document.createElement('option');
+                            opt.value          = catId;
+                            opt.textContent    = `${catVal.emoji || '🗂️'} ${catVal.name || catId}`;
+                            opt.dataset.custom = 'true';
+                            select.appendChild(opt);
+                        }
+                    }
+                });
+            } catch(e) { console.warn('[room] loadCustomCategories failed:', e); }
+        }
+
+        // ── TOAST ───────────────────────────────────────────────────────────────
+        function showToast(msg, duration = 3000) {
+            const t = document.createElement('div');
+            t.style.cssText = `
+                position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:9999;
+                background:rgba(0,0,0,.75);border:1.5px solid rgba(0,242,255,.4);border-radius:14px;
+                padding:10px 22px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
+                color:#fff;backdrop-filter:blur(14px);text-align:center;white-space:nowrap;
+                animation:_toast_in .3s ease;`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity    = '0';
+                t.style.transition = 'opacity .4s';
+                setTimeout(() => t.remove(), 450);
+            }, duration);
+        }
+        window.showToast = showToast;
+
+        // ══════════════════════════════════════════════════════════════════════
+        // ROOM STATE
+        // ══════════════════════════════════════════════════════════════════════
         let myName = localStorage.getItem('eljasus_user_name') || "";
         let myRoom = localStorage.getItem('currentRoom') || "";
         let isHost = localStorage.getItem('isHost') === 'true';
@@ -491,15 +518,37 @@ const firebaseConfig = {
             localStorage.setItem('currentRoom', myRoom);
         }
 
-        if (!myRoom || !myName) {
-            window.location.href = 'index.html';
-        }
+        if (!myRoom || !myName) { window.location.href = 'index.html'; }
 
         function toArray(val) {
             if (!val) return [];
             if (Array.isArray(val)) return val;
             return Object.values(val);
         }
+
+        // ══════════════════════════════════════════════════════════════════════
+        // AUTH + INIT
+        // ══════════════════════════════════════════════════════════════════════
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp, onChildAdded };
+
+            if (window.MOD) {
+                await MOD.init(db, user);
+                if (document.getElementById('_ej_ban')) return;
+            }
+
+            firebase_auth_user = user;
+
+            if (!_roomInitialized) {
+                _roomInitialized = true;
+                // Load custom categories BEFORE initialising the room
+                // so gameData is complete when game starts
+                await loadCustomCategories();
+                joinPendingAndInit();
+            }
+        });
 
         async function joinPendingAndInit() {
             if (pendingRoom) {
@@ -508,112 +557,107 @@ const firebaseConfig = {
                     if (snap.exists()) {
                         const d = snap.val();
                         const players = toArray(d.players);
-                        if (!players.includes(myName)) {
-                            if (players.length < 10) {
-                                await update(ref(db, 'rooms/' + myRoom), { players: [...players, myName] });
-                            }
+                        if (!players.includes(myName) && players.length < 10) {
+                            await update(ref(db, 'rooms/' + myRoom), { players: [...players, myName] });
                         }
                         isHost = false;
                         localStorage.setItem('isHost', 'false');
                     } else {
                         alert('الغرفة غير موجودة');
-                        window.location.href = 'index.html';
-                        return;
+                        window.location.href = 'index.html'; return;
                     }
                 } catch(e) {
-                    console.error('Failed to join pending room:', e);
                     alert('فشل الانضمام للغرفة: ' + e.message);
-                    window.location.href = 'index.html';
-                    return;
+                    window.location.href = 'index.html'; return;
                 }
             }
             setupPresence(myRoom, myName);
             initRoom();
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // HELPER
+        // ══════════════════════════════════════════════════════════════════════
         function hideAllGameScreens() {
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('discussion-screen').classList.add('hidden');
-            document.getElementById('voting-screen').classList.add('hidden');
-            document.getElementById('tie-screen').classList.add('hidden');
-            document.getElementById('spinner-screen').classList.add('hidden');
-            document.getElementById('spy-guess-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('room-overlay').classList.add('hidden');
+            ['game-screen','discussion-screen','voting-screen','tie-screen',
+             'spinner-screen','spy-guess-screen','result-screen','room-overlay']
+             .forEach(id => document.getElementById(id)?.classList.add('hidden'));
         }
 
         function setupPresence(roomCode, playerName) {
-            const connectedRef = ref(db, ".info/connected");
-            onValue(connectedRef, (snap) => {
-                if (snap.val() === true) {
-                    const roomRef = ref(db, `rooms/${roomCode}`);
-                    onDisconnect(roomRef).get().then((snapshot) => {
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            if (data.host === playerName) {
-                                onDisconnect(roomRef).remove();
-                            } else {
-                                let updatedPlayers = toArray(data.players).map(p => 
-                                    p === playerName ? `${playerName} (خامل)` : p
-                                );
-                                onDisconnect(ref(db, `rooms/${roomCode}/players`)).set(updatedPlayers);
-                            }
-                        }
-                    });
-                }
+            onValue(ref(db, '.info/connected'), (snap) => {
+                if (snap.val() !== true) return;
+                const roomRef = ref(db, `rooms/${roomCode}`);
+                onDisconnect(roomRef).get().then((snapshot) => {
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.val();
+                    if (data.host === playerName) {
+                        onDisconnect(roomRef).remove();
+                    } else {
+                        let updated = toArray(data.players).map(p =>
+                            p === playerName ? `${playerName} (خامل)` : p);
+                        onDisconnect(ref(db, `rooms/${roomCode}/players`)).set(updated);
+                    }
+                });
             });
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // MAIN ROOM LISTENER
+        // ══════════════════════════════════════════════════════════════════════
         function initRoom() {
             const roomRef = ref(db, 'rooms/' + myRoom);
-            
-            onValue(roomRef, (snap) => {
+            onValue(roomRef, async (snap) => {
                 let d;
                 try { d = snap.val(); } catch(e) { console.error('Room read error:', e); return; }
-                if(!d) { 
+                if (!d) {
                     localStorage.removeItem('currentRoom');
                     localStorage.removeItem('isHost');
-                    window.location.href = 'index.html';
-                    return; 
+                    window.location.href = 'index.html'; return;
                 }
+
+                // Restore from idle
                 if (d.players && toArray(d.players).includes(`${myName} (خامل)`)) {
-                    let restoredPlayers = toArray(d.players).map(p => p === `${myName} (خامل)` ? myName : p);
-                    update(ref(db, 'rooms/' + myRoom), { players: restoredPlayers });
-                    return;
+                    let restored = toArray(d.players).map(p => p === `${myName} (خامل)` ? myName : p);
+                    update(ref(db, 'rooms/' + myRoom), { players: restored }); return;
                 }
-                
-                if(!toArray(d.players).includes(myName)) {
+
+                if (!toArray(d.players).includes(myName)) {
                     alert("تم طردك من الغرفة");
                     localStorage.removeItem('currentRoom');
                     localStorage.removeItem('isHost');
-                    window.location.href = 'index.html';
-                    return;
+                    window.location.href = 'index.html'; return;
                 }
+
+                // Build profile cache so name tags show in all stages
+                await buildPlayerProfileCache(toArray(d.players));
 
                 document.getElementById('displayRoomCode').innerText = myRoom;
                 const pCount = toArray(d.players).length;
                 document.getElementById('pCount').innerText = `${pCount}/10`;
-                
                 isHost = (d.host === myName);
 
-                if(isHost) {
+                // ── Host controls ─────────────────────────────────────────────────
+                if (isHost) {
                     document.getElementById('host-controls').classList.remove('hidden');
                     document.getElementById('hostStartBtn').classList.remove('hidden');
                     document.getElementById('guestWaitMsg').classList.add('hidden');
-                    
                     const startBtn = document.getElementById('hostStartBtn');
-                    const msg = document.getElementById('minPlayersMsg');
-                    if(pCount >= 3) {
-                        startBtn.disabled = false;
-                        msg.classList.add('hidden');
-                    } else {
-                        startBtn.disabled = true;
-                        msg.classList.remove('hidden');
-                    }
-
+                    const msg      = document.getElementById('minPlayersMsg');
+                    if (pCount >= 3) { startBtn.disabled = false; msg.classList.add('hidden'); }
+                    else             { startBtn.disabled = true;  msg.classList.remove('hidden'); }
                     const vBtn = document.getElementById('toggleVisibility');
-                    vBtn.innerHTML = d.visibility === 'public' ? '<i class="fas fa-globe mr-1"></i> عام' : '<i class="fas fa-lock mr-1"></i> خاص';
-                    vBtn.className = d.visibility === 'public' ? "text-xs px-4 py-1.5 rounded-full border-2 border-green-500 text-green-400 font-bold hover:bg-green-500/10" : "text-xs px-4 py-1.5 rounded-full border-2 border-red-500 text-red-400 font-bold hover:bg-red-500/10";
+                    vBtn.innerHTML = d.visibility === 'public'
+                        ? '<i class="fas fa-globe mr-1"></i> عام'
+                        : '<i class="fas fa-lock mr-1"></i> خاص';
+                    vBtn.className = d.visibility === 'public'
+                        ? "text-xs px-4 py-1.5 rounded-full border-2 border-green-500 text-green-400 font-bold hover:bg-green-500/10"
+                        : "text-xs px-4 py-1.5 rounded-full border-2 border-red-500 text-red-400 font-bold hover:bg-red-500/10";
+                    // Sync host dropdown with room category
+                    if (d.category) {
+                        const sel = document.getElementById('updateCat');
+                        if (sel) sel.value = d.category;
+                    }
                 } else {
                     document.getElementById('host-controls').classList.add('hidden');
                     document.getElementById('hostStartBtn').classList.add('hidden');
@@ -621,78 +665,67 @@ const firebaseConfig = {
                     document.getElementById('minPlayersMsg').classList.add('hidden');
                 }
 
+                // ── WAITING ROOM — player list with name tags ─────────────────────
                 document.getElementById('roomPlayersList').innerHTML = toArray(d.players).map(p => {
-                    const isMe = (p === myName);
-                    const isTargetHost = (p === d.host);
-                    const isIdle = p.includes("(خامل)");
-                    const displayName = p.replace("(خامل)", "").trim();
-
+                    const isMe       = p === myName;
+                    const isTargetHost = p === d.host;
+                    const isIdle     = p.includes('(خامل)');
                     return `
-                        <div class="flex justify-between items-center p-3 glass rounded-xl border border-cyan-500/20 mb-2 hover:border-cyan-500/40 transition-all">
+                        <div class="flex justify-between items-center p-3 glass rounded-xl border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
                             <div class="flex items-center gap-3">
-                                <span class="text-xl">
-                                    ${isTargetHost ? '<i class="fas fa-crown"></i>' : (isIdle ? '💤' : '👤')} 
-                                </span>
-                                <span class="text-sm ${isIdle ? 'text-gray-500 italic' : 'text-white font-bold'}">
-                                    ${displayName} 
-                                    ${isIdle ? '<span class="text-[10px] ml-1 opacity-60 text-gray-500">(خامل)</span>' : ''}
-                                    ${isMe ? '<span class="text-[10px] text-cyan-400 ml-1">(أنت)</span>' : ''}
-                                </span>
+                                <span class="text-xl">${isTargetHost ? '👑' : isIdle ? '💤' : '👤'}</span>
+                                ${getPlayerHTML(p, { isHost: isTargetHost, isMe, isIdle })}
                             </div>
-                            
                             ${isHost && !isMe ? `
-                                <button onclick="kickPlayer('${p}')" 
-                                    class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-400 px-3 py-1.5 rounded-lg font-bold shadow-lg border border-red-500/30 transition-all">
+                                <button onclick="kickPlayer('${p}')"
+                                    class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-400 px-3 py-1.5 rounded-lg font-bold border border-red-500/30 transition-all">
                                     طرد
-                                </button>
-                            ` : ''}
-                        </div>
-                    `;
+                                </button>` : ''}
+                        </div>`;
                 }).join('');
-                
-                if(d.status && d.status !== 'waiting') {
+
+                // ── Route to correct game screen ──────────────────────────────────
+                if (d.status && d.status !== 'waiting') {
                     hideAllGameScreens();
-                    if(d.status === 'playing') showOnlineGame(d);
-                    else if(d.status === 'discussion') showDiscussionScreen(d);
-                    else if(d.status === 'voting') showVotingScreen(d);
-                    else if(d.status === 'tie') showTieScreen(d);
-                    else if(d.status === 'spinner') showSpinnerScreen(d);
-                    else if(d.status === 'spy_guess') showSpyGuessScreen(d);
-                    else if(d.status === 'result') showResultScreen(d);
-                } else { 
+                    if      (d.status === 'playing')   showOnlineGame(d);
+                    else if (d.status === 'discussion') showDiscussionScreen(d);
+                    else if (d.status === 'voting')    showVotingScreen(d);
+                    else if (d.status === 'tie')       showTieScreen(d);
+                    else if (d.status === 'spinner')   showSpinnerScreen(d);
+                    else if (d.status === 'spy_guess') showSpyGuessScreen(d);
+                    else if (d.status === 'result')    showResultScreen(d);
+                } else {
                     hideAllGameScreens();
                     document.getElementById('room-overlay').classList.remove('hidden');
                 }
             });
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // ROOM ACTIONS
+        // ══════════════════════════════════════════════════════════════════════
         async function handleLeave(data, nameToLeave) {
             let players = toArray(data.players).filter(p => p !== nameToLeave);
-            if(players.length === 0) {
+            if (players.length === 0) {
                 await remove(ref(db, 'rooms/' + myRoom));
             } else {
-                let updates = { players: players };
-                if(data.host === nameToLeave) {
-                    updates.host = players[Math.floor(Math.random() * players.length)];
-                }
+                let updates = { players };
+                if (data.host === nameToLeave) updates.host = players[Math.floor(Math.random() * players.length)];
                 await update(ref(db, 'rooms/' + myRoom), updates);
             }
         }
 
         window.kickPlayer = async (targetName) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            if(snap.exists()) {
-                const d = snap.val();
-                const newPlayers = toArray(d.players).filter(p => p !== targetName);
+            if (snap.exists()) {
+                const newPlayers = toArray(snap.val().players).filter(p => p !== targetName);
                 await update(ref(db, 'rooms/' + myRoom), { players: newPlayers });
             }
         };
 
         document.getElementById('leaveRoomBtn').onclick = async () => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            if(snap.exists()) {
-                await handleLeave(snap.val(), myName);
-            }
+            if (snap.exists()) await handleLeave(snap.val(), myName);
             localStorage.removeItem('currentRoom');
             localStorage.removeItem('isHost');
             window.location.href = 'index.html';
@@ -710,75 +743,74 @@ const firebaseConfig = {
         document.getElementById('hostStartBtn').onclick = async () => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d = snap.val();
-            
-            if(d.status && d.status !== 'waiting') {
-                alert("الرجاء الانتظار حتى انتهاء الجولة الحالية");
-                return;
-            }
-            
-            const secret = gameData[d.category][Math.floor(Math.random() * gameData[d.category].length)];
-            const spyCount = toArray(d.players).length >= 12 ? 3 : toArray(d.players).length >= 8 ? 2 : 1;
+            if (d.status && d.status !== 'waiting') { alert('الرجاء الانتظار حتى انتهاء الجولة الحالية'); return; }
+            // Pick secret from gameData — includes custom categories
+            const catWords = gameData[d.category];
+            if (!catWords || !catWords.length) { alert('لا توجد كلمات لهذه الفئة'); return; }
+            const secret = catWords[Math.floor(Math.random() * catWords.length)];
+            const players = toArray(d.players);
+            const spyCount = players.length >= 12 ? 3 : players.length >= 8 ? 2 : 1;
             const spyIndices = [];
             while (spyIndices.length < spyCount) {
-                const idx = Math.floor(Math.random() * toArray(d.players).length);
+                const idx = Math.floor(Math.random() * players.length);
                 if (!spyIndices.includes(idx)) spyIndices.push(idx);
             }
-            update(ref(db, 'rooms/' + myRoom), { 
-                status: 'playing', 
-                secret: secret, 
-                spyIdx: spyIndices[0],
-                spyIndices: spyIndices,
-                spyCount: spyCount,
-                turn: 0,
-                suspects: {},
-                discussionMessages: [],
-                readyForVote: [],
-                votes: {},
-                tiedPlayers: null,
-                spyGuess: null,
-                winner: null,
-                votedPlayer: null,
-                hints: {}
+            update(ref(db, 'rooms/' + myRoom), {
+                status: 'playing', secret, spyIdx: spyIndices[0], spyIndices, spyCount, turn: 0,
+                suspects: {}, discussionMessages: [], readyForVote: [], votes: {},
+                tiedPlayers: null, spyGuess: null, winner: null, votedPlayer: null, hints: {}
             });
         };
 
+        // ══════════════════════════════════════════════════════════════════════
+        // STAGE 1 — REVEAL (turn-based card)
+        // Name tag shown above the card for whose turn it is
+        // ══════════════════════════════════════════════════════════════════════
         function showOnlineGame(d) {
             hideAllGameScreens();
             document.getElementById('game-screen').classList.remove('hidden');
-            const isMyTurn = d.players[d.turn] === myName;
-            document.getElementById('targetPlayer').innerText = d.players[d.turn];
-            
+            const players    = toArray(d.players);
+            const curName    = players[d.turn];
+            const isMyTurn   = curName === myName;
+            const spyIndices = d.spyIndices || [d.spyIdx];
+
+            // Show current player name with theme
+            document.getElementById('targetPlayer').textContent = '';
+            document.getElementById('targetPlayerWrap').innerHTML =
+                getPlayerHTML(curName, {
+                    isHost: curName === d.host,
+                    isMe:   isMyTurn,
+                    large:  true,
+                });
+
             const card = document.getElementById('secretCard');
-            const btn = document.getElementById('nextBtn');
-            card.classList.remove('reveal-spy', 'reveal-innocent');
+            const btn  = document.getElementById('nextBtn');
+            card.classList.remove('reveal-spy','reveal-innocent');
             card.innerHTML = `<i class="fas fa-fingerprint text-7xl mb-4 opacity-20"></i><p class="font-bold opacity-50 text-lg">انقر للكشف 🔒</p>`;
-            card.style.pointerEvents = isMyTurn ? "auto" : "none";
+            card.style.pointerEvents = isMyTurn ? 'auto' : 'none';
             btn.classList.add('hidden');
 
             card.onclick = () => {
-                if((d.spyIndices || [d.spyIdx]).includes(toArray(d.players).indexOf(myName))) {
+                const myIdx = players.indexOf(myName);
+                if (spyIndices.includes(myIdx)) {
                     card.classList.add('reveal-spy');
-                    card.innerHTML = `<i class="fas fa-user-secret text-8xl mb-4"></i><h2 class="text-4xl font-black italic">جاسوس</h2>`;
-                    if(window.SND) SND.announce.spyReveal();
-                    if(window.particleSystem) particleSystem.spyReveal();
+                    card.innerHTML = `<i class="fas fa-user-secret text-8xl mb-4"></i><h2 class="text-4xl font-black italic">جاسوس 🕵️</h2>`;
+                    if (window.SND)            SND.announce?.spyReveal?.();
+                    if (window.particleSystem) particleSystem.spyReveal?.();
                 } else {
                     card.classList.add('reveal-innocent');
-                    card.innerHTML = `<i class="fas fa-key text-6xl mb-4"></i><h2 class="text-4xl font-black">${d.secret}</h2>`;
-                    if(window.SND) SND.announce.innocentReveal();
-                    if(window.particleSystem) particleSystem.innocentReveal();
+                    card.innerHTML = `<i class="fas fa-key text-6xl mb-4"></i><p class="text-[10px] opacity-70">الكلمة السرية</p><h2 class="text-3xl font-black">${d.secret}</h2>`;
+                    if (window.SND)            SND.announce?.innocentReveal?.();
+                    if (window.particleSystem) particleSystem.innocentReveal?.();
                 }
                 btn.classList.remove('hidden');
                 card.onclick = null;
             };
 
             btn.onclick = () => {
-                if(d.turn + 1 >= toArray(d.players).length) {
-                    update(ref(db, 'rooms/' + myRoom), { 
-                        status: 'discussion',
-                        suspects: {},
-                        discussionMessages: [],
-                        readyForVote: [],
-                        votes: {}
+                if (d.turn + 1 >= players.length) {
+                    update(ref(db, 'rooms/' + myRoom), {
+                        status: 'discussion', suspects: {}, discussionMessages: [], readyForVote: [], votes: {}
                     });
                 } else {
                     update(ref(db, 'rooms/' + myRoom), { turn: d.turn + 1 });
@@ -786,106 +818,96 @@ const firebaseConfig = {
             };
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // STAGE 2 — DISCUSSION  (suspect cards with name tags)
+        // ══════════════════════════════════════════════════════════════════════
         function showDiscussionScreen(d) {
             hideAllGameScreens();
             document.getElementById('discussion-screen').classList.remove('hidden');
 
-            const chatInput = document.getElementById('discussionInput');
-            if (chatInput && window.EmojiPicker && !chatInput._emojiInit) {
-                chatInput._emojiInit = true;
-                new EmojiPicker(chatInput, null);
-            }
-
             if (typeof loadHintBalance === 'function') loadHintBalance();
             showRoomHints(d);
-            
-            suspectsList.innerHTML = toArray(d.players).map(p => {
-                const suspectCount = d.suspects && d.suspects[p] ? d.suspects[p].length : 0;
-                const isSuspect = d.suspects && d.suspects[p] && d.suspects[p].includes(myName);
+
+            const players = toArray(d.players);
+            document.getElementById('suspectsList').innerHTML = players.map(p => {
+                const suspectCount = d.suspects?.[p]?.length || 0;
+                const isSuspect    = d.suspects?.[p]?.includes(myName);
+                const cleanName    = p.replace(' (خامل)', '').trim();
                 return `
                     <div class="glass rounded-2xl p-4 border-2 ${isSuspect ? 'border-red-500' : 'border-cyan-500/30'} text-center hover:border-cyan-500/60 transition-all">
                         <div class="text-3xl mb-2">${p === d.host ? '👑' : '👤'}</div>
-                        <h3 class="font-black text-sm mb-2">${p}</h3>
+                        <div class="flex justify-center mb-2">
+                            ${getPlayerHTML(p, { isHost: p === d.host, isMe: p === myName })}
+                        </div>
                         <div class="text-xs opacity-60 mb-3">${suspectCount} شخص يشك به</div>
-                        <button onclick="toggleSuspect('${p}')" class="${isSuspect ? 'bg-red-600 hover:bg-red-700' : 'bg-white/10 hover:bg-white/20'} w-full py-2 rounded-lg text-xs font-bold transition-all border-2 ${isSuspect ? 'border-red-400' : 'border-white/20'}">
+                        <button onclick="toggleSuspect('${cleanName}')"
+                            class="${isSuspect ? 'bg-red-600 hover:bg-red-700' : 'bg-white/10 hover:bg-white/20'} w-full py-2 rounded-lg text-xs font-bold transition-all border-2 ${isSuspect ? 'border-red-400' : 'border-white/20'}">
                             ${isSuspect ? 'إلغاء الشك ❌' : 'أشك به 🔍'}
                         </button>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
 
-            if(d.discussionMessages) {
+            if (d.discussionMessages) {
                 const messagesDiv = document.getElementById('discussionMessages');
-                messagesDiv.innerHTML = d.discussionMessages.map(m => 
+                messagesDiv.innerHTML = d.discussionMessages.map(m =>
                     `<div class="mb-2"><span class="font-bold text-cyan-400">${m.player}:</span> ${m.msg}</div>`
                 ).join('');
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
 
-            const readyCount = d.readyForVote ? d.readyForVote.length : 0;
-            document.getElementById('discussionInfo').innerText = `${readyCount}/${toArray(d.players).length} لاعب جاهز للتصويت`;
-            
+            const readyCount = d.readyForVote?.length || 0;
+            document.getElementById('discussionInfo').innerText = `${readyCount}/${players.length} لاعب جاهز للتصويت`;
+
             const goVoteBtn = document.getElementById('goVoteBtn');
-            const isReady = d.readyForVote && d.readyForVote.includes(myName);
+            const isReady   = d.readyForVote?.includes(myName);
             goVoteBtn.innerText = isReady ? 'في انتظار اللاعبين... ⏳' : 'الانتقال للتصويت ✅';
-            goVoteBtn.disabled = isReady;
-            goVoteBtn.onclick = () => markReadyForVote();
+            goVoteBtn.disabled  = isReady;
+            goVoteBtn.onclick   = markReadyForVote;
         }
 
-        window.toggleSuspect = async (targetPlayer) => {
+        window.toggleSuspect = async (targetCleanName) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            const d = snap.val();
+            const d    = snap.val();
             let suspects = d.suspects || {};
-            if(!suspects[targetPlayer]) suspects[targetPlayer] = [];
-            if(suspects[targetPlayer].includes(myName)) {
-                suspects[targetPlayer] = suspects[targetPlayer].filter(p => p !== myName);
+            // Find the actual player name (may include خامل suffix)
+            const actual = toArray(d.players).find(p => p.replace(' (خامل)','').trim() === targetCleanName) || targetCleanName;
+            if (!suspects[actual]) suspects[actual] = [];
+            if (suspects[actual].includes(myName)) {
+                suspects[actual] = suspects[actual].filter(p => p !== myName);
             } else {
-                suspects[targetPlayer].push(myName);
+                suspects[actual].push(myName);
             }
             update(ref(db, 'rooms/' + myRoom), { suspects });
         };
 
         async function markReadyForVote() {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            const d = snap.val();
-            let ready = d.readyForVote || [];
-            if(!ready.includes(myName)) {
+            const d    = snap.val();
+            let ready  = d.readyForVote || [];
+            if (!ready.includes(myName)) {
                 ready.push(myName);
                 await update(ref(db, 'rooms/' + myRoom), { readyForVote: ready });
             }
-            if(ready.length >= toArray(d.players).length) {
+            if (ready.length >= toArray(d.players).length) {
                 await update(ref(db, 'rooms/' + myRoom), { status: 'voting', votes: {} });
             }
         }
 
-        document.getElementById('toggleChatBtn').onclick = () => {
-            document.getElementById('chatWindow').classList.toggle('hidden');
-        };
-
-        document.getElementById('closeChatBtn').onclick = () => {
-            document.getElementById('chatWindow').classList.add('hidden');
-        };
+        document.getElementById('toggleChatBtn').onclick = () => document.getElementById('chatWindow').classList.toggle('hidden');
+        document.getElementById('closeChatBtn').onclick  = () => document.getElementById('chatWindow').classList.add('hidden');
 
         document.getElementById('sendDiscussionBtn').onclick = async () => {
             const input = document.getElementById('discussionInput');
             const msg   = input.value.trim();
             if (!msg) return;
-
-            // ── MODERATION SCAN ──────────────────────────────────
-            // MOD.scan returns true = message is blocked (warn/ban handled internally)
             if (window.MOD) {
                 const blocked = await MOD.scan(msg);
-                if (blocked) {
-                    input.value = ''; // clear bad text from input
-                    return;           // do NOT send
-                }
+                if (blocked) { input.value = ''; return; }
             }
-            // ─────────────────────────────────────────────────────
-
             const snap = await get(ref(db, 'rooms/' + myRoom));
             const d    = snap.val();
             let messages = d.discussionMessages || [];
-            messages.push({ player: myName, msg: msg });
+            messages.push({ player: myName, msg });
             await update(ref(db, 'rooms/' + myRoom), { discussionMessages: messages });
             input.value = '';
         };
@@ -894,56 +916,57 @@ const firebaseConfig = {
             if (e.key === 'Enter') document.getElementById('sendDiscussionBtn').click();
         });
 
+        // ══════════════════════════════════════════════════════════════════════
+        // STAGE 3 — VOTING  (vote cards with name tags)
+        // ══════════════════════════════════════════════════════════════════════
         function showVotingScreen(d) {
-            if (window.SND) SND.announce.voting();
+            if (window.SND) SND.announce?.voting?.();
             hideAllGameScreens();
             document.getElementById('voting-screen').classList.remove('hidden');
-            
-            const hasVoted = d.votes && d.votes[myName];
-            const voteCards = document.getElementById('voteCards');
-            
-            voteCards.innerHTML = toArray(d.players).map(p => {
+
+            const players  = toArray(d.players);
+            const hasVoted = d.votes?.[myName];
+
+            document.getElementById('voteCards').innerHTML = players.map(p => {
                 const voteCount = Object.values(d.votes || {}).filter(v => v === p).length;
-                const isMyVote = d.votes && d.votes[myName] === p;
+                const isMyVote  = d.votes?.[myName] === p;
                 return `
-                    <div class="glass rounded-2xl p-4 border-2 ${isMyVote ? 'border-yellow-500' : 'border-cyan-500/30'} text-center ${hasVoted ? 'opacity-50' : ''} hover:border-cyan-500/60 transition-all">
+                    <div class="glass rounded-2xl p-4 border-2 ${isMyVote ? 'border-yellow-500' : 'border-cyan-500/30'} text-center ${hasVoted ? 'opacity-70' : ''} hover:border-cyan-500/60 transition-all">
                         <div class="text-4xl mb-2">${p === d.host ? '👑' : '👤'}</div>
-                        <h3 class="font-black text-sm mb-2">${p}</h3>
+                        <div class="flex justify-center mb-2">
+                            ${getPlayerHTML(p, { isHost: p === d.host, isMe: p === myName })}
+                        </div>
                         <div class="text-xs opacity-60 mb-3 font-bold">${voteCount} صوت</div>
-                        <button onclick="castVote('${p}')" ${hasVoted ? 'disabled' : ''} class="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed w-full py-2 rounded-lg text-xs font-bold transition-all border-2 border-yellow-400/50">
+                        <button onclick="castVote('${p.replace(/'/g,"&#39;")}')" ${hasVoted ? 'disabled' : ''}
+                            class="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed w-full py-2 rounded-lg text-xs font-bold transition-all border-2 border-yellow-400/50">
                             ${isMyVote ? 'تم التصويت ✓' : 'صوّت 🗳️'}
                         </button>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
 
             const votedCount = Object.keys(d.votes || {}).length;
-            document.getElementById('votingStatus').innerText = `${votedCount}/${toArray(d.players).length} لاعب قام بالتصويت`;
+            document.getElementById('votingStatus').innerText = `${votedCount}/${players.length} لاعب قام بالتصويت`;
         }
 
         window.castVote = async (targetPlayer) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            const d = snap.val();
-            if(d.votes && d.votes[myName]) return;
+            const d    = snap.val();
+            if (d.votes?.[myName]) return;
             let votes = d.votes || {};
             votes[myName] = targetPlayer;
             await update(ref(db, 'rooms/' + myRoom), { votes });
-            if(Object.keys(votes).length >= toArray(d.players).length) {
-                processVotes(d, votes);
-            }
+            if (Object.keys(votes).length >= toArray(d.players).length) processVotes(d, votes);
         };
 
         async function processVotes(d, votes) {
             const voteCounts = {};
             toArray(d.players).forEach(p => voteCounts[p] = 0);
-            Object.values(votes).forEach(v => voteCounts[v]++);
+            Object.values(votes).forEach(v => { voteCounts[v] = (voteCounts[v] || 0) + 1; });
             const maxVotes = Math.max(...Object.values(voteCounts));
             const topVoted = Object.keys(voteCounts).filter(p => voteCounts[p] === maxVotes);
-            if(topVoted.length > 1) {
+            if (topVoted.length > 1) {
                 await update(ref(db, 'rooms/' + myRoom), { status: 'tie', tiedPlayers: topVoted });
-                setTimeout(async () => {
-                    await update(ref(db, 'rooms/' + myRoom), { status: 'spinner' });
-                }, 2000);
+                setTimeout(async () => { await update(ref(db, 'rooms/' + myRoom), { status: 'spinner' }); }, 2000);
             } else {
                 checkGameResult(d, topVoted[0]);
             }
@@ -952,14 +975,14 @@ const firebaseConfig = {
         function showTieScreen(d) {
             hideAllGameScreens();
             document.getElementById('tie-screen').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('tie-screen').classList.add('hidden'); }, 2000);
+            setTimeout(() => document.getElementById('tie-screen').classList.add('hidden'), 2000);
         }
 
         function showSpinnerScreen(d) {
             hideAllGameScreens();
             document.getElementById('spinner-screen').classList.remove('hidden');
             const spinnerContent = document.getElementById('spinnerContent');
-            const startBtn = document.getElementById('startSpinnerBtn');
+            const startBtn       = document.getElementById('startSpinnerBtn');
             startBtn.onclick = async () => {
                 startBtn.disabled = true;
                 let index = 0;
@@ -971,69 +994,84 @@ const firebaseConfig = {
                     clearInterval(interval);
                     const selected = d.tiedPlayers[Math.floor(Math.random() * d.tiedPlayers.length)];
                     spinnerContent.innerText = selected;
-                    setTimeout(async () => { await checkGameResult(d, selected); }, 1500);
+                    setTimeout(() => checkGameResult(d, selected), 1500);
                 }, 3000);
             };
         }
 
         async function checkGameResult(d, votedPlayer) {
             const spyName = d.players[d.spyIdx];
-            if(votedPlayer === spyName) {
+            if (votedPlayer === spyName) {
                 await update(ref(db, 'rooms/' + myRoom), { status: 'spy_guess', votedPlayer: spyName });
             } else {
-                await update(ref(db, 'rooms/' + myRoom), { status: 'result', winner: 'spy', spyName: spyName });
+                await update(ref(db, 'rooms/' + myRoom), { status: 'result', winner: 'spy', spyName });
             }
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // STAGE 4 — SPY GUESS  (uses live gameData including custom categories)
+        // ══════════════════════════════════════════════════════════════════════
         function showSpyGuessScreen(d) {
             hideAllGameScreens();
             document.getElementById('spy-guess-screen').classList.remove('hidden');
+
             const spyIndices = d.spyIndices || [d.spyIdx];
-            const spyNames   = spyIndices.map(i => d.players[i]).filter(Boolean);
-            const spyName    = spyNames[0] || d.players[d.spyIdx];
-            document.getElementById('spyNameDisplay').innerText = spyNames.length > 1 
-                    ? `الجواسيس هم: ${spyNames.join(' و ')}` 
-                    : `الجاسوس هو: ${spyName}`;
-            const categoryWords = gameData[d.category];
+            const spyNames   = spyIndices.map(i => toArray(d.players)[i]).filter(Boolean);
+            const spyName    = spyNames[0] || toArray(d.players)[d.spyIdx];
+
+            document.getElementById('spyNameDisplay').innerHTML = spyNames.length > 1
+                ? `الجواسيس هم: <strong>${spyNames.join(' و ')}</strong>`
+                : `الجاسوس هو: <strong>${spyName}</strong>`;
+
+            // ★ FIX: use dynamic gameData (includes custom categories)
+            const categoryWords = gameData[d.category] || [];
             const wordsList = document.getElementById('categoryWordsList');
-            const isSpy = spyNames.includes(myName);
-            const hasGuessed = d.spyGuess !== undefined;
-            wordsList.innerHTML = categoryWords.map(word => `
-                <button onclick="spyGuessWord('${word}')" ${!isSpy || hasGuessed ? 'disabled' : ''} 
-                    class="glass rounded-xl p-3 border-2 border-cyan-500/30 font-bold text-sm hover:border-cyan-500 disabled:opacity-30 transition-all">
-                    ${word}
-                </button>
-            `).join('');
-            if(hasGuessed) {
+            const isSpy     = spyNames.includes(myName);
+            const hasGuessed = d.spyGuess !== undefined && d.spyGuess !== null;
+
+            if (categoryWords.length === 0) {
+                wordsList.innerHTML = '<p class="text-red-400 col-span-3">لا توجد كلمات لهذه الفئة</p>';
+            } else {
+                wordsList.innerHTML = categoryWords.map(word => `
+                    <button onclick="spyGuessWord('${word.replace(/'/g,"&#39;")}')"
+                        ${!isSpy || hasGuessed ? 'disabled' : ''}
+                        class="glass rounded-xl p-3 border-2 border-cyan-500/30 font-bold text-sm hover:border-cyan-500 disabled:opacity-30 transition-all text-right">
+                        ${word}
+                    </button>`).join('');
+            }
+
+            if (hasGuessed) {
                 const correct = d.spyGuess === d.secret;
-                document.getElementById('guessResult').innerHTML = correct ? 
-                    '<span class="text-green-500">✓ إجابة صحيحة!</span>' : 
-                    '<span class="text-red-500">✗ إجابة خاطئة!</span>';
+                document.getElementById('guessResult').innerHTML = correct
+                    ? '<span class="text-green-500">✓ إجابة صحيحة! الجاسوس يفوز!</span>'
+                    : `<span class="text-red-500">✗ إجابة خاطئة! الكلمة كانت: <strong>${d.secret}</strong></span>`;
             }
         }
 
         window.spyGuessWord = async (word) => {
             const snap = await get(ref(db, 'rooms/' + myRoom));
-            const d = snap.val();
+            const d    = snap.val();
             const correct = word === d.secret;
-            await update(ref(db, 'rooms/' + myRoom), { 
+            await update(ref(db, 'rooms/' + myRoom), {
                 spyGuess: word, status: 'result',
                 winner: correct ? 'spy' : 'innocents',
-                spyName: d.players[d.spyIdx]
+                spyName: toArray(d.players)[d.spyIdx]
             });
         };
 
+        // ══════════════════════════════════════════════════════════════════════
+        // STAGE 5 — RESULT SCREEN  (player summary with roles + name tags)
+        // ══════════════════════════════════════════════════════════════════════
         function showResultScreen(d) {
             setTimeout(() => {
                 if (window.SND) {
-                    d.winner === 'spy' ? SND.announce.spyWins() : SND.announce.innocentsWin();
+                    d.winner === 'spy' ? SND.announce?.spyWins?.() : SND.announce?.innocentsWin?.();
                 }
-                if (window.particleSystem) particleSystem.victoryConfetti();
+                if (window.particleSystem) particleSystem.victoryConfetti?.();
                 setTimeout(() => {
                     if (window.SS) {
                         const myIdx    = toArray(d.players).indexOf(myName);
                         const spyIdxs  = d.spyIndices || [d.spyIdx];
-                        const spyNames = spyIdxs.map(i => d.players[i]);
                         SS.capture({
                             winner: d.winner, word: d.secret, category: d.category,
                             players: toArray(d.players).map((name, i) => ({ name, role: spyIdxs.includes(i) ? 'spy' : 'innocent' })),
@@ -1046,34 +1084,55 @@ const firebaseConfig = {
 
             hideAllGameScreens();
             document.getElementById('result-screen').classList.remove('hidden');
-            
-            const icon = document.getElementById('resultIcon');
-            const title = document.getElementById('resultTitle');
-            const message = document.getElementById('resultMessage');
-            
-            updatePlayerStats(d);
-            
-            if(d.winner === 'spy') {
-                icon.innerText = '🕵️';
-                title.innerText = 'الجاسوس انتصر!';
-                message.innerText = `${d.spyName} نجح في المهمة!`;
+
+            const spyIndices = d.spyIndices || [d.spyIdx];
+            const spyNames   = spyIndices.map(i => toArray(d.players)[i]).filter(Boolean);
+
+            // Result header
+            if (d.winner === 'spy') {
+                document.getElementById('resultIcon').innerText  = '🕵️';
+                document.getElementById('resultTitle').innerText = 'الجاسوس انتصر!';
+                document.getElementById('resultMessage').innerText = `${d.spyName} نجح في المهمة! الكلمة كانت: ${d.secret}`;
             } else {
-                icon.innerText = '🏆';
-                title.innerText = 'الأبرياء انتصروا!';
-                message.innerText = `تم كشف الجاسوس ${d.spyName}!`;
+                document.getElementById('resultIcon').innerText  = '🏆';
+                document.getElementById('resultTitle').innerText = 'الأبرياء انتصروا!';
+                document.getElementById('resultMessage').innerText = `تم كشف الجاسوس! الكلمة كانت: ${d.secret}`;
             }
-            
+
+            // ★ Player list with roles + name tags in result screen
+            const players = toArray(d.players);
+            document.getElementById('resultPlayerList').innerHTML = players.map((p, i) => {
+                const isSpy  = spyIndices.includes(i);
+                const won    = (d.winner === 'spy' && isSpy) || (d.winner === 'innocents' && !isSpy);
+                return `
+                    <div class="flex items-center gap-2 p-2 rounded-xl border ${isSpy ? 'border-red-500/50 bg-red-500/08' : 'border-green-500/30 bg-green-500/05'}">
+                        <span class="text-lg">${isSpy ? '🕵️' : '😇'}</span>
+                        <div class="flex-1">
+                            ${getPlayerHTML(p, { isHost: p === d.host, isMe: p === myName })}
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-1 rounded-lg ${isSpy ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+                            ${isSpy ? 'جاسوس' : 'بريء'}
+                        </span>
+                        <span style="font-size:14px;">${won ? '✅' : '❌'}</span>
+                    </div>`;
+            }).join('');
+
+            updatePlayerStats(d);
+
             document.getElementById('returnToRoomBtn').onclick = async () => {
                 hideAllGameScreens();
-                await update(ref(db, 'rooms/' + myRoom), { 
-                    status: 'waiting', turn: 0, secret: null, spyIdx: null,
+                await update(ref(db, 'rooms/' + myRoom), {
+                    status: 'waiting', turn: 0, secret: null, spyIdx: null, spyIndices: null,
                     suspects: {}, discussionMessages: [], readyForVote: [], votes: {},
-                    tiedPlayers: null, spyGuess: null, winner: null, votedPlayer: null
+                    tiedPlayers: null, spyGuess: null, winner: null, votedPlayer: null, hints: {}
                 });
                 document.getElementById('room-overlay').classList.remove('hidden');
             };
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // RANKS + STATS
+        // ══════════════════════════════════════════════════════════════════════
         const RANKS = [
             { name:'Bronze',   min:0,     max:999,      css:'rank-bronze'   },
             { name:'Silver',   min:1000,  max:2499,     css:'rank-silver'   },
@@ -1085,27 +1144,29 @@ const firebaseConfig = {
 
         const ACHIEVEMENTS = {
             firstWin:       { name:'الفوز الأول',   check: s => (s.spyWins+s.innocentWins) >= 1 },
-            masterDeceiver: { name:'خبير الخداع',    check: s => s.spyWins >= 10                 },
-            eagleEye:       { name:'عين الصقر',      check: s => (s.correctVotes||0) >= 5         },
-            centuryClub:    { name:'نادي المئة',     check: s => s.totalGames >= 100             },
-            hotStreak:      { name:'سلسلة نارية',    check: s => (s.currentStreak||0) >= 5       },
-            diamondPlayer:  { name:'لاعب ألماسي',   check: (s,pts) => pts >= 10000              }
+            masterDeceiver: { name:'خبير الخداع',    check: s => s.spyWins >= 10              },
+            eagleEye:       { name:'عين الصقر',      check: s => (s.correctVotes||0) >= 5     },
+            centuryClub:    { name:'نادي المئة',     check: s => s.totalGames >= 100          },
+            hotStreak:      { name:'سلسلة نارية',    check: s => (s.currentStreak||0) >= 5   },
+            diamondPlayer:  { name:'لاعب ألماسي',   check: (s,pts) => pts >= 10000           }
         };
 
-        async function updatePlayerStats(gameData) {
-            const winner     = gameData.winner;
-            const spyIndices = gameData.spyIndices || [gameData.spyIdx];
-            const category   = gameData.category || 'عام';
+        async function updatePlayerStats(gameData_result) {
             if (!firebase_auth_user) return;
-            const uid = firebase_auth_user.uid;
-            const myIdx = gameData.players.indexOf(myName);
+            const uid     = firebase_auth_user.uid;
+            const players = toArray(gameData_result.players);
+            const myIdx   = players.indexOf(myName);
             if (myIdx === -1) return;
-            const isSpy = spyIndices.includes(myIdx);
-            const won   = (isSpy && winner === 'spy') || (!isSpy && winner === 'innocents');
+            const spyIndices = gameData_result.spyIndices || [gameData_result.spyIdx];
+            const isSpy  = spyIndices.includes(myIdx);
+            const won    = (isSpy && gameData_result.winner === 'spy') || (!isSpy && gameData_result.winner === 'innocents');
+            const category = gameData_result.category || 'عام';
+
             const snap = await get(ref(db, `players/${uid}`));
             const data = snap.exists() ? snap.val() : {};
-            const s    = data.stats || {};
+            const s    = data.stats   || {};
             const currentPts = data.rankPoints || 0;
+
             const newStats = {
                 totalGames:       (s.totalGames       || 0) + 1,
                 spyWins:          (s.spyWins          || 0) + (isSpy && won ? 1 : 0),
@@ -1116,23 +1177,28 @@ const firebaseConfig = {
                 longestWinStreak: Math.max(s.longestWinStreak || 0, won ? (s.currentStreak || 0) + 1 : 0),
                 lastPlayed:       Date.now()
             };
+
             let coinsEarned = 5;
-            if (won)           coinsEarned += isSpy ? 50 : 20;
+            if (won) coinsEarned += isSpy ? 50 : 20;
             if (newStats.currentStreak >= 3) coinsEarned += newStats.currentStreak * 5;
             const newCoins = (data.coins || 0) + coinsEarned;
+
             let ptsEarned = 10;
             if (won) ptsEarned += isSpy ? 100 : 50;
             if (newStats.currentStreak > 1) ptsEarned += newStats.currentStreak * 10;
             const newPts  = currentPts + ptsEarned;
             const newRank = getRank(newPts);
             const oldRank = getRank(currentPts);
+
             const catStats = data.categoryStats || {};
             catStats[category] = (catStats[category] || 0) + 1;
+
             const history = data.gameHistory || [];
             history.push({ role: isSpy?'spy':'innocent', won, category, timestamp: Date.now() });
             if (history.length > 50) history.splice(0, history.length - 50);
-            const unlocked = data.achievements || {};
-            const newlyUnlocked = [];
+
+            const unlocked       = data.achievements || {};
+            const newlyUnlocked  = [];
             for (const [id, ach] of Object.entries(ACHIEVEMENTS)) {
                 if (!unlocked[id] && ach.check(newStats, newPts)) {
                     unlocked[id] = { timestamp: Date.now() };
@@ -1140,35 +1206,40 @@ const firebaseConfig = {
                     coinsEarned += 100;
                 }
             }
+
             const updates = {};
-            updates[`players/${uid}/stats`]        = newStats;
-            updates[`players/${uid}/coins`]        = newCoins;
-            updates[`players/${uid}/rankPoints`]   = newPts;
-            updates[`players/${uid}/rank`]         = newRank.name;
-            updates[`players/${uid}/categoryStats`]= catStats;
-            updates[`players/${uid}/gameHistory`]  = history;
-            updates[`players/${uid}/achievements`] = unlocked;
+            updates[`players/${uid}/stats`]         = newStats;
+            updates[`players/${uid}/coins`]         = newCoins;
+            updates[`players/${uid}/rankPoints`]    = newPts;
+            updates[`players/${uid}/rank`]          = newRank.name;
+            updates[`players/${uid}/categoryStats`] = catStats;
+            updates[`players/${uid}/gameHistory`]   = history;
+            updates[`players/${uid}/achievements`]  = unlocked;
             await update(ref(db), updates);
+
             setTimeout(() => {
-                if (window.SND) SND.announce.coinsEarned(coinsEarned);
-                if (window.showToast) showToast('🪙 +' + coinsEarned + ' عملة  •  +' + ptsEarned + ' نقطة رتبة');
+                if (window.SND) SND.announce?.coinsEarned?.(coinsEarned);
+                showToast(`🪙 +${coinsEarned} عملة  •  +${ptsEarned} نقطة رتبة`);
                 if (newRank.name !== oldRank.name) {
-                    if (window.SND) SND.announce.rankUp(newRank.name);
-                    if (window.particleSystem) particleSystem.burst(40, 'particle-victory');
-                    setTimeout(() => showToast('🎉 ترقية! أصبحت ' + newRank.name), 2000);
+                    if (window.SND) SND.announce?.rankUp?.(newRank.name);
+                    if (window.particleSystem) particleSystem.burst?.(40, 'particle-victory');
+                    setTimeout(() => showToast(`🎉 ترقية! أصبحت ${newRank.name}`), 2000);
                 }
                 newlyUnlocked.forEach((name, i) => {
                     setTimeout(() => {
-                        if (window.SND) SND.announce.achievement(name);
-                        if (window.showToast) showToast('🏆 إنجاز جديد: ' + name);
+                        if (window.SND) SND.announce?.achievement?.(name);
+                        showToast(`🏆 إنجاز جديد: ${name}`);
                     }, (i + 1) * 3000);
                 });
             }, 1500);
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // ROOM CODE COPY + QR
+        // ══════════════════════════════════════════════════════════════════════
         document.getElementById('roomCodeContainer').onclick = () => {
             navigator.clipboard.writeText(myRoom)
-                .then(() => { if(window.showToast) showToast('📋 تم نسخ الكود: ' + myRoom); })
+                .then(() => showToast('📋 تم نسخ الكود: ' + myRoom))
                 .catch(() => {});
         };
 
@@ -1176,24 +1247,31 @@ const firebaseConfig = {
         if (qrShareEl) {
             const qrBtn = document.createElement('button');
             qrBtn.innerHTML = '📲';
-            qrBtn.title = 'مشاركة QR';
+            qrBtn.title     = 'مشاركة QR';
             qrBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:18px;margin-right:6px;';
-            qrBtn.onclick = (e) => { e.stopPropagation(); if(window.QR) QR.generate(myRoom); };
+            qrBtn.onclick = (e) => { e.stopPropagation(); if (window.QR) QR.generate(myRoom); };
             qrShareEl.appendChild(qrBtn);
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        // VOICE CHAT  (onChildAdded now imported correctly)
+        // ══════════════════════════════════════════════════════════════════════
         setTimeout(() => {
             if (window.VoiceChat && firebase_auth_user) {
-                window._firebaseFns = { ref, push, onChildAdded };
+                window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp, onChildAdded };
                 window.VC = new VoiceChat(db, myRoom, firebase_auth_user.uid, myName);
             }
         }, 2000);
 
+        // ══════════════════════════════════════════════════════════════════════
+        // HINT SYSTEM
+        // ══════════════════════════════════════════════════════════════════════
         async function loadHintBalance() {
             if (!firebase_auth_user) return;
             const snap = await get(ref(db, `players/${firebase_auth_user.uid}/hints`));
             document.getElementById('hintBalance').innerText = snap.val() || 0;
         }
+        window.loadHintBalance = loadHintBalance;
 
         window.useHint = async function() {
             if (!firebase_auth_user) { alert('يجب تسجيل الدخول'); return; }
@@ -1204,14 +1282,14 @@ const firebaseConfig = {
             const d = roomSnap.val();
             if (!d) return;
             const spyIndices = d.spyIndices || [d.spyIdx];
-            const spyNames   = spyIndices.map(i => d.players[i]);
+            const spyNames   = spyIndices.map(i => toArray(d.players)[i]);
             const innocents  = toArray(d.players).filter((_, i) => !spyIndices.includes(i));
             const hintTypes = [
-                () => `الجاسوس${spyNames.length > 1 ? 'ون' : ''} ${spyNames.length > 1 ? 'في' : 'في'} قائمة اللاعبين`,
-                () => `ليس ${innocents[Math.floor(Math.random() * innocents.length)]} جاسوساً`,
                 () => `عدد الجواسيس: ${spyNames.length}`,
-                () => `الجاسوس ليس اللاعب رقم ${(innocents.indexOf(innocents[Math.floor(Math.random()*innocents.length)])) + 1 } في القائمة`,
+                () => `ليس "${innocents[Math.floor(Math.random() * innocents.length)]}" جاسوساً`,
                 () => `الكلمة السرية تبدأ بحرف "${d.secret ? d.secret[0] : '?'}"`,
+                () => `الجاسوس ليس المضيف ${d.host === myName ? '(هذا أنت)' : ''}`,
+                () => `طول الكلمة: ${d.secret ? d.secret.length : '?'} حرف`,
             ];
             const hint = hintTypes[Math.floor(Math.random() * hintTypes.length)]();
             await update(ref(db, `players/${firebase_auth_user.uid}`), { hints: bal - 1 });
@@ -1221,7 +1299,7 @@ const firebaseConfig = {
             await update(ref(db, 'rooms/' + myRoom), {
                 [`hints/${firebase_auth_user.uid}`]: { hint, usedAt: Date.now(), by: myName }
             });
-            if (window.SND) SND.play('coins');
+            if (window.SND) SND.play?.('coins');
         };
 
         function showRoomHints(d) {
@@ -1230,13 +1308,23 @@ const firebaseConfig = {
             if (!vals.length) return;
             const last = vals[vals.length - 1];
             document.getElementById('hint-display').classList.remove('hidden');
-            document.getElementById('hint-text').innerText = last.hint + ' (من ' + (last.by||'لاعب') + ')';
+            document.getElementById('hint-text').innerText = `${last.hint}  (من ${last.by || 'لاعب'})`;
         }
     </script>
-<script>
-    window.alert   = (msg)             => UIAlert(msg);
-    window.confirm = (msg)             => UIConfirm(msg);
-    window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
-</script>
+
+    <script>
+        window.alert   = (msg)             => typeof UIAlert   === 'function' ? UIAlert(msg)           : window._origAlert(msg);
+        window.confirm = (msg)             => typeof UIConfirm  === 'function' ? UIConfirm(msg)          : window._origConfirm(msg);
+        window.prompt  = (msg, def)        => typeof UIPrompt   === 'function' ? UIPrompt(msg,{defaultValue:def}) : window._origPrompt(msg,def);
+        window._origAlert   = window._origAlert   || alert;
+        window._origConfirm = window._origConfirm || confirm;
+        window._origPrompt  = window._origPrompt  || prompt;
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+        }
+    </script>
 </body>
 </html>

@@ -382,7 +382,7 @@
             transition: all 0.2s ease;
             flex-shrink: 0;
             font-size: 15px;
-            margin-right: auto;
+            margin-right: 50px;
         }
 
         #closeNav:hover {
@@ -462,6 +462,11 @@
             #sideNav.mobile-open #navList .nav-item:nth-child(8)  { opacity:1; transform:none; transition-delay:0.35s; }
             #sideNav.mobile-open #navList .nav-item:nth-child(9)  { opacity:1; transform:none; transition-delay:0.37s; }
             #sideNav.mobile-open #navList .nav-item:nth-child(10) { opacity:1; transform:none; transition-delay:0.39s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(11) { opacity:1; transform:none; transition-delay:0.41s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(13) { opacity:1; transform:none; transition-delay:0.43s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(14) { opacity:1; transform:none; transition-delay:0.45s; }
+            #sideNav.mobile-open #navList .nav-item:nth-child(16) { opacity:1; transform:none; transition-delay:0.47s; }
+            #sideNav.mobile-open #navList .nav-item               { opacity:1; transform:none; }
             #sideNav.mobile-open #navList .nav-divider-label      { opacity:1; transform:none; transition-delay:0.37s; }
             #sideNav.mobile-open #navDiscord                      { opacity:1; transform:none; transition-delay:0.42s; }
 
@@ -1199,6 +1204,18 @@
     </footer>
 
    <script type="module">
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const stored = localStorage.getItem('eljasus_ban_v3');
+            if (stored) {
+                const ban = JSON.parse(stored);
+                const valid = ban && (ban.isPermanent || ban.expiresAt === -1 || Date.now() < ban.expiresAt);
+                if (valid && window.MOD?.showBanScreen) {
+                    MOD.showBanScreen(ban);
+                }
+            }
+        } catch(e) {}
+    });
         // Loading Screen Handler
         window.addEventListener('load', () => {
             const loader = document.getElementById('loading-screen');

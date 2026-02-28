@@ -18,6 +18,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="dialogs.js"></script>
     <script src="moderation.js"></script>
+  <script>
+    // Override alert/confirm/prompt after dialogs.js loads
+    document.addEventListener('DOMContentLoaded', () => {
+        window.alert   = (msg)             => UIAlert(msg);
+        window.confirm = (msg)             => UIConfirm(msg);
+        window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
+    });
+  </script>
     <style>
         :root { 
             --bg-color: #080808;
@@ -155,34 +163,9 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-  ONLINEROOMS.HTML — 4 BUGS FIXED
-
-  CHANGE 1: Move these 3 tags from bottom of <body> to <head>
-            (fixes dialogs.js race + MOD race condition)
-  ═══════════════════════════════════════════════════════════════ -->
-
-<!-- ADD TO <head>, right before </head>: -->
-<head>
-  <!-- ...existing head content... -->
-  <script src="moderation.js"></script>
-  <script>
-    // Override alert/confirm/prompt after dialogs.js loads
-    document.addEventListener('DOMContentLoaded', () => {
-        window.alert   = (msg)             => UIAlert(msg);
-        window.confirm = (msg)             => UIConfirm(msg);
-        window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
-    });
-  </script>
-</head>
-
     <script type="module">
         import { initializeApp }                                     from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged }    from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-
-        // FIX 1: get, update, push, serverTimestamp were MISSING from import
-        // → ReferenceError on window._firebaseFns line crashed entire module
-        // → onAuthStateChanged never ran → spinner forever
         import { getDatabase, ref, onValue, get, update, push, serverTimestamp }
                                                                      from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
@@ -201,7 +184,6 @@
         const auth = getAuth(app);
         const db   = getDatabase(app);
 
-        // Now safe — all 6 values are imported
         window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
 
         // ── DOM shortcuts ──────────────────────────────────────────
@@ -285,10 +267,6 @@
                     const room = rooms[code];
                     if (!room) return;
 
-                    // FIX 3: All rooms in index.html are created with visibility:'private'
-                    // so isPublic was always false → rooms page always showed empty.
-                    // Solution: show ALL waiting rooms on this page — it's the discovery page.
-                    // (visibility check removed; waiting check kept)
                     const isWaiting =
                         !room.status              ||
                         room.status === 'waiting' ||
@@ -316,8 +294,6 @@
         // ── Auth: sign in then start listeners ─────────────────────
         onAuthStateChanged(auth, async user => {
             if (user) {
-                // FIX 2: added if(window.MOD) guard — MOD may not be loaded yet
-                // without this guard: "Cannot read properties of undefined (reading 'init')"
                 if (window.MOD) {
                     await MOD.init(db, user);
                     if (document.getElementById('_ej_ban')) return;
