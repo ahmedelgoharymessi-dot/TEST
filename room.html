@@ -89,6 +89,25 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,242,255,.05); border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-color), var(--secondary-color)); border-radius: 10px; }
         .custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--accent-color) rgba(0,242,255,.05); }
+
+        /* ── GLOBAL SCROLLBAR FIX ─────────────────────────────── */
+        /* All game content lives in fixed overlays — body never scrolls */
+        html, body { overflow: hidden !important; height: 100%; }
+        /* Prevent layout shift when scrollbars appear/disappear */
+        .custom-scrollbar { scrollbar-gutter: stable; }
+        /* Shared class for inner-card scroll containers */
+        .inner-scroll {
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,242,255,.4) transparent;
+        }
+        .inner-scroll::-webkit-scrollbar { width: 5px; }
+        .inner-scroll::-webkit-scrollbar-track { background: transparent; }
+        .inner-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00f2ff, #7c30ff);
+            border-radius: 5px;
+        }
         .fa-crown { color: #ffd700; filter: drop-shadow(0 0 8px rgba(255,215,0,.8)); }
         .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(0,242,255,.8), 0 0 20px rgba(0,242,255,.6); }
 
@@ -121,7 +140,7 @@
 
     <!-- Game Screen (Turn-based reveal) -->
     <div id="game-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="max-w-md w-full">
+        <div class="max-w-md w-full inner-scroll" style="max-height:90dvh;">
             <div class="text-center mb-6">
                 <p class="text-[11px] dynamic-text-primary font-black uppercase tracking-widest mb-2" style="font-family:'Orbitron',sans-serif;">دور اللاعب</p>
                 <div id="targetPlayerWrap" class="flex items-center justify-center gap-2 flex-wrap">
@@ -138,7 +157,7 @@
 
     <!-- Discussion Screen -->
     <div id="discussion-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-4xl rounded-[2rem] p-4 border border-white/10 shadow-2xl relative" style="max-height:94dvh;overflow-y:auto;">
+        <div class="glass w-full max-w-4xl rounded-[2rem] p-4 border border-white/10 shadow-2xl relative inner-scroll" style="max-height:94dvh;">
             
             <!-- Chat Button -->
             <button id="toggleChatBtn" class="fixed top-6 left-6 z-[60] bg-gradient-to-r from-cyan-500 to-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all border-2 border-cyan-400/50">
@@ -193,7 +212,7 @@
 
     <!-- Voting Screen -->
     <div id="voting-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative">
+        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative inner-scroll" style="max-height:90dvh;">
             <h2 class="text-2xl font-black mb-4 text-center neon-text">التصويت 🕵️‍♂️</h2>
             <p class="text-sm opacity-70 mb-4 text-center font-bold">اختر اللاعب الذي تشك أنه الجاسوس</p>
             <div id="voteCards" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6"></div>
@@ -220,7 +239,7 @@
 
     <!-- Spy Guess Screen -->
     <div id="spy-guess-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-red-500/30 shadow-2xl text-center max-h-[90vh] overflow-y-auto">
+        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-red-500/30 shadow-2xl text-center inner-scroll" style="max-height:90dvh;">
             <h2 class="text-2xl font-black mb-2 text-red-500 neon-text" style="text-shadow:0 0 15px rgba(239,68,68,.8);">🕵️ الجاسوس المكشوف</h2>
             <p id="spyNameDisplay" class="text-xl mb-4 font-bold"></p>
             <p class="text-sm opacity-70 mb-4">اختر الكلمة الصحيحة من القائمة</p>
@@ -231,7 +250,7 @@
 
     <!-- Result Screen -->
     <div id="result-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-lg rounded-[2.5rem] p-8 border border-white/10 shadow-2xl text-center">
+        <div class="glass w-full max-w-lg rounded-[2.5rem] p-8 border border-white/10 shadow-2xl text-center inner-scroll" style="max-height:90dvh;">
             <div id="resultIcon" class="text-8xl mb-4"></div>
             <h2 id="resultTitle" class="text-3xl font-black mb-2 neon-text"></h2>
             <p id="resultMessage" class="text-lg mb-4 font-bold"></p>
@@ -245,7 +264,7 @@
 
     <!-- Room Overlay (Waiting Room) -->
     <div id="room-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
-        <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative overflow-y-auto" style="max-height:92dvh;">
+        <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative inner-scroll" style="max-height:92dvh;">
             
             <a href="index.html" class="absolute top-4 left-4 text-gray-400 hover:text-cyan-400 transition-colors">
                 <i class="fas fa-arrow-right text-xl"></i>
